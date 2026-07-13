@@ -58,7 +58,7 @@
 <body>
 <header>
   <h1>✈ ATC</h1>
-  <small>Tour de contrôle des entretiens</small>
+  <small>Tour de contrôle des entretiens · v0.3</small>
 </header>
 <main>
   <div class="card">
@@ -66,6 +66,7 @@
       <button class="tab active" data-tab="import">Import</button>
       <button class="tab" data-tab="people">Équipe</button>
       <button class="tab" data-tab="patients">Patients</button>
+      <button class="tab" data-tab="workshops">Ateliers</button>
       <button class="tab" data-tab="constraints">Contraintes</button>
       <button class="tab" data-tab="search">Recherche</button>
       <button class="tab" data-tab="data">Données</button>
@@ -137,6 +138,28 @@
     <div class="card">
       <h2>Patients</h2>
       <div id="patientList"></div>
+    </div>
+  </section>
+
+  
+  <section id="workshops" class="panel hidden">
+    <div class="card">
+      <h2>Créer un atelier</h2>
+      <p class="muted">Ajoute l’atelier une seule fois, puis coche les patients inscrits. Leur indisponibilité sera créée automatiquement.</p>
+      <div class="row">
+        <div><label>Nom de l’atelier</label><input id="wTitle" placeholder="Théâtre d’objets"></div>
+        <div><label>Jour</label><select id="wDay"></select></div>
+        <div><label>Début</label><input id="wStart" type="time" step="900" value="14:00"></div>
+        <div><label>Fin</label><input id="wEnd" type="time" step="900" value="15:00"></div>
+        <div><label>Intervenant (facultatif)</label><input id="wLeader" placeholder="Valentine"></div>
+        <div><label>Nombre de places (facultatif)</label><input id="wCapacity" type="number" min="1" placeholder="6"></div>
+      </div>
+      <div class="actions"><button onclick="addWorkshop()">Créer l’atelier</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Ateliers de la semaine</h2>
+      <div id="workshopList"></div>
     </div>
   </section>
 
@@ -242,8 +265,9 @@ const SHIFT={
   "M":["07:30","15:30"], "S":["13:00","20:30"], "J":["09:00","17:00"],
   "12":["00:00","23:59"]
 };
-let db=JSON.parse(localStorage.getItem("atc_v02")||'{"me":"Moi","nurses":[],"interns":[],"patients":[],"constraints":[],"dates":[],"importedAt":null}');
-function save(){localStorage.setItem("atc_v02",JSON.stringify(db));render()}
+let db=JSON.parse(localStorage.getItem("atc_v03")||'{"me":"Moi","nurses":[],"interns":[],"patients":[],"constraints":[],"workshops":[],"dates":[],"importedAt":null}');
+if(!Array.isArray(db.workshops)) db.workshops=[];
+function save(){localStorage.setItem("atc_v03",JSON.stringify(db));render()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m}
 function toTime(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
@@ -326,6 +350,36 @@ function addAdultConstraint(){
  addRangeConstraint(acPerson.value,acDay.value,acStart.value,acEnd.value,acReason.value,"adult");
 }
 function filterConstraints(kind){constraintFilter=kind;render()}
+
+function addWorkshop(){
+ const title=wTitle.value.trim(),day=wDay.value,start=wStart.value,end=wEnd.value;
+ const leader=wLeader.value.trim(),capacity=Number(wCapacity.value)||null;
+ if(!title||!day||!start||!end||start>=end){alert("Vérifie le nom, le jour et les horaires.");return}
+ db.workshops.push({
+   id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[]
+ });
+ wTitle.value="";wLeader.value="";wCapacity.value="";
+ save()
+}
+function removeWorkshop(id){
+ if(confirm("Supprimer cet atelier ?")){
+   db.workshops=db.workshops.filter(w=>w.id!==id);save()
+ }
+}
+function toggleWorkshopPatient(workshopId,patientId,checked){
+ const w=db.workshops.find(x=>x.id===workshopId);if(!w)return;
+ if(checked && !w.patientIds.includes(patientId)) w.patientIds.push(patientId);
+ if(!checked) w.patientIds=w.patientIds.filter(id=>id!==patientId);
+ save()
+}
+function workshopConflictsForPatient(patientId,day,start,end){
+ return db.workshops.filter(w =>
+   w.day===day &&
+   w.patientIds.includes(patientId) &&
+   overlap(start,end,w.start,w.end)
+ );
+}
+
 function removeConstraint(id){db.constraints=db.constraints.filter(x=>x.id!==id);save()}
 function adultOptions(){
  const arr=[{id:"me",name:db.me,type:"Moi"}];
@@ -358,6 +412,8 @@ function evaluate(p,day,start,end){
    const cs=constraintsFor(id,day,start,end);
    cs.forEach(c=>reasons.push(`${name} : ${c.reason}`));
  }
+ const workshops=workshopConflictsForPatient(p.id,day,start,end);
+ workshops.forEach(w=>reasons.push(`${p.code} : atelier ${w.title}`));
  return {ok:reasons.length===0,reasons,nurse,intern};
 }
 function findForPatient(){
@@ -394,7 +450,7 @@ function importBackup(e){
  const f=e.target.files[0];if(!f)return;
  const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save()}catch{alert("Sauvegarde invalide.")}};r.readAsText(f)
 }
-function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem("atc_v02");location.reload()}}
+function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem("atc_v03");location.reload()}}
 function render(){
  meName.value=db.me||"Moi";
  importStatus.innerHTML=db.importedAt?`<strong>${db.nurses.length} IDE importés</strong><br>Dernier import : ${new Date(db.importedAt).toLocaleString("fr-FR")}`:"Aucun fichier importé.";
@@ -413,6 +469,7 @@ function render(){
  pcPatient.innerHTML=patients.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");
  acDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  pcDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
+ wDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sDay.innerHTML='<option value="">Toute la semaine</option>'+DAYS.map(d=>`<option>${d}</option>`).join("");
  fDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sPatient.innerHTML=db.patients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
@@ -426,6 +483,31 @@ function render(){
    const kindLabel=inferredKind==="patient"?"Patient":"Adulte";
    return `<div class="person"><strong>${esc(name)}</strong> <span class="badge">${kindLabel}</span><br>${esc(c.day)} ${c.start}–${c.end} <span class="badge">${esc(c.reason)}</span> <button class="secondary" onclick="removeConstraint('${c.id}')">Supprimer</button></div>`
  }).join(""):"Aucune contrainte dans ce filtre.";
+
+ const sortedWorkshops=[...db.workshops].sort((a,b)=>{
+   const da=DAYS.indexOf(a.day),dbi=DAYS.indexOf(b.day);
+   return da-dbi || a.start.localeCompare(b.start);
+ });
+ workshopList.innerHTML=sortedWorkshops.length?sortedWorkshops.map(w=>{
+   const enrolled=db.patients.filter(p=>w.patientIds.includes(p.id));
+   const capacityText=w.capacity?`${enrolled.length}/${w.capacity} places`:`${enrolled.length} patient(s)`;
+   const patientChecks=db.patients.length?db.patients.map(p=>`
+     <label class="switchline" style="margin:6px 0">
+       <input type="checkbox" ${w.patientIds.includes(p.id)?"checked":""}
+         onchange="toggleWorkshopPatient('${w.id}','${p.id}',this.checked)">
+       <span>${esc(p.code)}</span>
+     </label>`).join(""):"<span class='muted'>Ajoute d’abord des patients.</span>";
+   return `<div class="person">
+     <strong>${esc(w.title)}</strong> <span class="badge">${esc(w.day)} ${w.start}–${w.end}</span>
+     ${w.leader?`<span class="badge">${esc(w.leader)}</span>`:""}
+     <br><span class="muted">${capacityText}</span>
+     <details style="margin-top:8px">
+       <summary>Inscrire les patients</summary>
+       <div style="padding-top:6px">${patientChecks}</div>
+     </details>
+     <div class="actions"><button class="secondary" onclick="removeWorkshop('${w.id}')">Supprimer l’atelier</button></div>
+   </div>`;
+ }).join(""):"Aucun atelier créé.";
 }
 render();
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
