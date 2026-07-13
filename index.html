@@ -142,25 +142,60 @@
 
   <section id="constraints" class="panel hidden">
     <div class="card">
-      <h2>Ajouter une contrainte</h2>
+      <h2>Contraintes des patients</h2>
+      <p class="muted">Choisis une plage entière : par exemple mardi 10:00–11:30 = médiation.</p>
       <div class="row">
-        <div><label>Personne</label><select id="cPerson"></select></div>
-        <div><label>Jour</label><select id="cDay"></select></div>
-        <div><label>Début</label><input id="cStart" type="time" step="1800" value="10:00"></div>
-        <div><label>Fin</label><input id="cEnd" type="time" step="1800" value="10:30"></div>
-        <div><label>Motif</label>
-          <select id="cReason">
-            <option>Médiation</option><option>Scolarité</option><option>Visite</option>
-            <option>Sortie</option><option>Repas</option><option>Réunion</option>
-            <option>Consultation</option><option>Cours</option><option>Autre</option>
+        <div><label>Patient</label><select id="pcPatient"></select></div>
+        <div><label>Jour</label><select id="pcDay"></select></div>
+        <div><label>Début</label><input id="pcStart" type="time" step="1800" value="10:00"></div>
+        <div><label>Fin</label><input id="pcEnd" type="time" step="1800" value="11:00"></div>
+        <div><label>Type</label>
+          <select id="pcReason">
+            <option>Médiation</option>
+            <option>Scolarité</option>
+            <option>Visite</option>
+            <option>Sortie</option>
+            <option>Repas</option>
+            <option>Autre</option>
           </select>
         </div>
       </div>
-      <div class="actions"><button onclick="addConstraint()">Bloquer ce créneau</button></div>
+      <div class="actions"><button onclick="addPatientConstraint()">Ajouter la plage patient</button></div>
     </div>
+
+    <div class="card">
+      <h2>Contraintes des adultes</h2>
+      <p class="muted">Pour toi et les internes : réunions, cours, consultations, absences…</p>
+      <div class="row">
+        <div><label>Adulte</label><select id="acPerson"></select></div>
+        <div><label>Jour</label><select id="acDay"></select></div>
+        <div><label>Début</label><input id="acStart" type="time" step="1800" value="10:00"></div>
+        <div><label>Fin</label><input id="acEnd" type="time" step="1800" value="11:00"></div>
+        <div><label>Type</label>
+          <select id="acReason">
+            <option>Réunion</option>
+            <option>Synthèse</option>
+            <option>Consultation</option>
+            <option>Staff</option>
+            <option>Supervision</option>
+            <option>Cours</option>
+            <option>Formation</option>
+            <option>Absence</option>
+            <option>Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions"><button onclick="addAdultConstraint()">Ajouter la plage adulte</button></div>
+    </div>
+
     <div class="card">
       <h2>Contraintes de la semaine</h2>
-      <div id="constraintList"></div>
+      <div class="actions">
+        <button class="secondary" onclick="filterConstraints('all')">Toutes</button>
+        <button class="secondary" onclick="filterConstraints('patient')">Patients</button>
+        <button class="secondary" onclick="filterConstraints('adult')">Adultes</button>
+      </div>
+      <div id="constraintList" style="margin-top:10px"></div>
     </div>
   </section>
 
@@ -207,8 +242,8 @@ const SHIFT={
   "M":["07:30","15:30"], "S":["13:00","20:30"], "J":["09:00","17:00"],
   "12":["00:00","23:59"]
 };
-let db=JSON.parse(localStorage.getItem("atc_v01")||'{"me":"Moi","nurses":[],"interns":[],"patients":[],"constraints":[],"dates":[],"importedAt":null}');
-function save(){localStorage.setItem("atc_v01",JSON.stringify(db));render()}
+let db=JSON.parse(localStorage.getItem("atc_v02")||'{"me":"Moi","nurses":[],"interns":[],"patients":[],"constraints":[],"dates":[],"importedAt":null}');
+function save(){localStorage.setItem("atc_v02",JSON.stringify(db));render()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m}
 function toTime(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
@@ -278,18 +313,30 @@ function addPatient(){
  pCode.value="";pSep.checked=false;save()
 }
 function removePatient(id){db.patients=db.patients.filter(x=>x.id!==id);db.constraints=db.constraints.filter(x=>x.personId!==id);save()}
-function addConstraint(){
- const personId=cPerson.value,day=cDay.value,start=cStart.value,end=cEnd.value,reason=cReason.value;
+let constraintFilter="all";
+function addRangeConstraint(personId,day,start,end,reason,kind){
  if(!personId||!day||!start||!end||start>=end){alert("Vérifie les champs.");return}
- db.constraints.push({id:crypto.randomUUID(),personId,day,start,end,reason});
+ db.constraints.push({id:crypto.randomUUID(),personId,day,start,end,reason,kind});
  save()
 }
+function addPatientConstraint(){
+ addRangeConstraint(pcPatient.value,pcDay.value,pcStart.value,pcEnd.value,pcReason.value,"patient");
+}
+function addAdultConstraint(){
+ addRangeConstraint(acPerson.value,acDay.value,acStart.value,acEnd.value,acReason.value,"adult");
+}
+function filterConstraints(kind){constraintFilter=kind;render()}
 function removeConstraint(id){db.constraints=db.constraints.filter(x=>x.id!==id);save()}
-function peopleOptions(){
+function adultOptions(){
  const arr=[{id:"me",name:db.me,type:"Moi"}];
  db.interns.forEach(x=>arr.push({id:x.id,name:x.name,type:"Interne"}));
- db.patients.forEach(x=>arr.push({id:x.id,name:x.code,type:"Patient"}));
  return arr;
+}
+function patientOptions(){
+ return db.patients.map(x=>({id:x.id,name:x.code,type:"Patient"}));
+}
+function peopleOptions(){
+ return [...adultOptions(),...patientOptions()];
 }
 function nurseById(id){return db.nurses.find(x=>x.id===id)}
 function internById(id){return db.interns.find(x=>x.id===id)}
@@ -347,7 +394,7 @@ function importBackup(e){
  const f=e.target.files[0];if(!f)return;
  const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save()}catch{alert("Sauvegarde invalide.")}};r.readAsText(f)
 }
-function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem("atc_v01");location.reload()}}
+function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem("atc_v02");location.reload()}}
 function render(){
  meName.value=db.me||"Moi";
  importStatus.innerHTML=db.importedAt?`<strong>${db.nurses.length} IDE importés</strong><br>Dernier import : ${new Date(db.importedAt).toLocaleString("fr-FR")}`:"Aucun fichier importé.";
@@ -359,16 +406,26 @@ function render(){
    const n=nurseById(p.nurseId),i=internById(p.internId);
    return `<div class="person"><strong>${esc(p.code)}</strong> ${p.separation?'<span class="badge">Séparation</span>':''}<br><span class="muted">IDE ${esc(n?.alias||"?")} · Interne ${esc(i?.name||"?")}</span><br><button class="secondary" onclick="removePatient('${p.id}')">Supprimer</button></div>`
  }).join(""):"Aucun patient.";
- const ppl=peopleOptions();
- cPerson.innerHTML=ppl.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.type}</option>`).join("");
- cDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
+ const adults=adultOptions();
+ const patients=patientOptions();
+ const ppl=[...adults,...patients];
+ acPerson.innerHTML=adults.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.type}</option>`).join("");
+ pcPatient.innerHTML=patients.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");
+ acDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
+ pcDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sDay.innerHTML='<option value="">Toute la semaine</option>'+DAYS.map(d=>`<option>${d}</option>`).join("");
  fDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sPatient.innerHTML=db.patients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
- constraintList.innerHTML=db.constraints.length?db.constraints.map(c=>{
+ const visibleConstraints=db.constraints.filter(c=>{
+   const inferredKind=c.kind || (db.patients.some(p=>p.id===c.personId)?"patient":"adult");
+   return constraintFilter==="all" || inferredKind===constraintFilter;
+ });
+ constraintList.innerHTML=visibleConstraints.length?visibleConstraints.map(c=>{
    const name=ppl.find(x=>x.id===c.personId)?.name||"?";
-   return `<div class="person"><strong>${esc(name)}</strong> — ${esc(c.day)} ${c.start}–${c.end} <span class="badge">${esc(c.reason)}</span> <button class="secondary" onclick="removeConstraint('${c.id}')">Supprimer</button></div>`
- }).join(""):"Aucune contrainte.";
+   const inferredKind=c.kind || (db.patients.some(p=>p.id===c.personId)?"patient":"adult");
+   const kindLabel=inferredKind==="patient"?"Patient":"Adulte";
+   return `<div class="person"><strong>${esc(name)}</strong> <span class="badge">${kindLabel}</span><br>${esc(c.day)} ${c.start}–${c.end} <span class="badge">${esc(c.reason)}</span> <button class="secondary" onclick="removeConstraint('${c.id}')">Supprimer</button></div>`
+ }).join(""):"Aucune contrainte dans ce filtre.";
 }
 render();
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
