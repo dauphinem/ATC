@@ -58,7 +58,7 @@
 <body>
 <header>
   <h1>✈ ATC</h1>
-  <small>Tour de contrôle des entretiens · v0.3</small>
+  <small>Tour de contrôle des entretiens · v0.4</small>
 </header>
 <main>
   <div class="card">
@@ -144,7 +144,17 @@
   
   <section id="workshops" class="panel hidden">
     <div class="card">
-      <h2>Créer un atelier</h2>
+      <h2>Importer les ateliers de la semaine</h2>
+      <p class="muted">Le fichier doit contenir les colonnes : Jour, Début, Fin, Atelier, Intervenant, Places. La colonne Patients peut exister mais elle sera ignorée : tu cocheras ensuite uniquement tes patients.</p>
+      <input id="workshopExcelFile" type="file" accept=".xls,.xlsx">
+      <div class="actions">
+        <button onclick="importWorkshopsExcel()">Importer le tableau Excel</button>
+      </div>
+      <div id="workshopImportStatus" class="status muted" style="margin-top:10px">Aucun tableau d’ateliers importé.</div>
+    </div>
+
+    <div class="card">
+      <h2>Créer ponctuellement un atelier</h2>
       <p class="muted">Ajoute l’atelier une seule fois, puis coche les patients inscrits. Leur indisponibilité sera créée automatiquement.</p>
       <div class="row">
         <div><label>Nom de l’atelier</label><input id="wTitle" placeholder="Théâtre d’objets"></div>
@@ -265,9 +275,9 @@ const SHIFT={
   "M":["07:30","15:30"], "S":["13:00","20:30"], "J":["09:00","17:00"],
   "12":["00:00","23:59"]
 };
-let db=JSON.parse(localStorage.getItem("atc_v03")||'{"me":"Moi","nurses":[],"interns":[],"patients":[],"constraints":[],"workshops":[],"dates":[],"importedAt":null}');
+let db=JSON.parse(localStorage.getItem("atc_v04")||'{"me":"Moi","nurses":[],"interns":[],"patients":[],"constraints":[],"workshops":[],"dates":[],"importedAt":null}');
 if(!Array.isArray(db.workshops)) db.workshops=[];
-function save(){localStorage.setItem("atc_v03",JSON.stringify(db));render()}
+function save(){localStorage.setItem("atc_v04",JSON.stringify(db));render()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m}
 function toTime(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
@@ -350,6 +360,99 @@ function addAdultConstraint(){
  addRangeConstraint(acPerson.value,acDay.value,acStart.value,acEnd.value,acReason.value,"adult");
 }
 function filterConstraints(kind){constraintFilter=kind;render()}
+
+
+function normalizeHeader(value){
+ return String(value??"").trim().toLowerCase()
+   .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+   .replace(/\s+/g," ");
+}
+function normalizeDay(value){
+ const raw=normalizeHeader(value);
+ const map={
+   "lundi":"Lundi","lun":"Lundi","l":"Lundi",
+   "mardi":"Mardi","mar":"Mardi","m":"Mardi",
+   "mercredi":"Mercredi","mer":"Mercredi","me":"Mercredi",
+   "jeudi":"Jeudi","jeu":"Jeudi","j":"Jeudi",
+   "vendredi":"Vendredi","ven":"Vendredi","v":"Vendredi"
+ };
+ return map[raw]||null;
+}
+function normalizeTime(value){
+ if(value===null||value===undefined||value==="") return "";
+ if(typeof value==="number"){
+   const total=Math.round(value*24*60);
+   return String(Math.floor(total/60)%24).padStart(2,"0")+":"+String(total%60).padStart(2,"0");
+ }
+ const s=String(value).trim().toLowerCase()
+   .replace("h",":").replace(/\s+/g,"");
+ const m=s.match(/^(\d{1,2})(?::?(\d{2}))?$/);
+ if(!m) return "";
+ return String(Number(m[1])).padStart(2,"0")+":"+String(Number(m[2]||0)).padStart(2,"0");
+}
+async function importWorkshopsExcel(){
+ const file=workshopExcelFile.files[0];
+ if(!file){alert("Choisis un fichier Excel.");return}
+ if(typeof XLSX==="undefined"){
+   alert("Le module Excel n’a pas chargé. Ouvre ATC avec une connexion Internet puis réessaie.");
+   return;
+ }
+ try{
+   const buffer=await file.arrayBuffer();
+   const workbook=XLSX.read(buffer,{type:"array",cellDates:false});
+   const worksheet=workbook.Sheets[workbook.SheetNames[0]];
+   const rows=XLSX.utils.sheet_to_json(worksheet,{header:1,defval:"",raw:true});
+   if(!rows.length) throw new Error("Le tableau est vide.");
+
+   const headers=rows[0].map(normalizeHeader);
+   const findCol=(names)=>headers.findIndex(h=>names.includes(h));
+   const colDay=findCol(["jour"]);
+   const colStart=findCol(["debut","heure debut","début"]);
+   const colEnd=findCol(["fin","heure fin"]);
+   const colTitle=findCol(["atelier","nom atelier","mediation","médiation"]);
+   const colLeader=findCol(["intervenant","animateur","therapeute","thérapeute"]);
+   const colCapacity=findCol(["places","capacite","capacité","nombre de places"]);
+
+   if([colDay,colStart,colEnd,colTitle].some(i=>i<0)){
+     throw new Error("Colonnes obligatoires non reconnues : Jour, Début, Fin, Atelier.");
+   }
+
+   const imported=[];
+   const skipped=[];
+   for(let r=1;r<rows.length;r++){
+     const row=rows[r];
+     const day=normalizeDay(row[colDay]);
+     const start=normalizeTime(row[colStart]);
+     const end=normalizeTime(row[colEnd]);
+     const title=String(row[colTitle]??"").trim();
+     const leader=colLeader>=0?String(row[colLeader]??"").trim():"";
+     const capacityRaw=colCapacity>=0?row[colCapacity]:"";
+     const capacity=capacityRaw!=="" && !isNaN(Number(capacityRaw)) ? Number(capacityRaw) : null;
+     if(!day||!start||!end||!title||start>=end){
+       if(row.some(v=>String(v).trim()!=="")) skipped.push(r+1);
+       continue;
+     }
+     const duplicate=db.workshops.some(w=>
+       w.day===day && w.start===start && w.end===end &&
+       w.title.trim().toLowerCase()===title.toLowerCase()
+     );
+     if(!duplicate){
+       imported.push({
+         id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[]
+       });
+     }
+   }
+
+   db.workshops.push(...imported);
+   save();
+   workshopImportStatus.innerHTML=
+     `<strong>${imported.length} atelier(s) importé(s)</strong>`+
+     (skipped.length?`<br>${skipped.length} ligne(s) ignorée(s) car incomplètes ou illisibles.`:"")+
+     `<br><span class="muted">Les noms de patients du fichier n’ont pas été importés.</span>`;
+ }catch(err){
+   workshopImportStatus.innerHTML=`<strong>Import impossible</strong><br>${esc(err.message||err)}`;
+ }
+}
 
 function addWorkshop(){
  const title=wTitle.value.trim(),day=wDay.value,start=wStart.value,end=wEnd.value;
@@ -450,9 +553,12 @@ function importBackup(e){
  const f=e.target.files[0];if(!f)return;
  const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save()}catch{alert("Sauvegarde invalide.")}};r.readAsText(f)
 }
-function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem("atc_v03");location.reload()}}
+function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem("atc_v04");location.reload()}}
 function render(){
  meName.value=db.me||"Moi";
+ if(typeof workshopImportStatus!=="undefined" && db.workshops.length){
+   workshopImportStatus.innerHTML=`<strong>${db.workshops.length} atelier(s) enregistré(s)</strong><br><span class="muted">Tu peux importer un nouveau tableau ou ajouter un atelier ponctuel.</span>`;
+ }
  importStatus.innerHTML=db.importedAt?`<strong>${db.nurses.length} IDE importés</strong><br>Dernier import : ${new Date(db.importedAt).toLocaleString("fr-FR")}`:"Aucun fichier importé.";
  nurseList.innerHTML=db.nurses.length?db.nurses.map(n=>`<div class="person"><label>${esc(n.original)}</label><input value="${esc(n.alias)}" onchange="renameNurse('${n.id}',this.value)"></div>`).join(""):"Aucun IDE importé.";
  internList.innerHTML=db.interns.length?db.interns.map(i=>`<div class="person"><strong>${esc(i.name)}</strong> <button class="secondary" onclick="removeIntern('${i.id}')">Supprimer</button></div>`).join(""):"Aucun interne.";
