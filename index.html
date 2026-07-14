@@ -5,29 +5,33 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="theme-color" content="#efe8d8">
+  <meta name="theme-color" content="#76170f">
   <link rel="manifest" href="manifest.webmanifest">
   <title>ATC</title>
   <style>
     :root{
-      --bg:#efe8d8;--paper:#fffaf0;--ink:#25282a;--muted:#6f706d;
-      --line:#cfc5b4;--navy:#314755;--green:#dcebd8;--amber:#f5e5b3;
-      --red:#efd1cc;--blue:#dce6ee;
+      --bg:#f2f2f4;--paper:rgba(255,255,255,.88);--ink:#1d1d1f;--muted:#6e6e73;
+      --line:rgba(60,60,67,.16);--navy:#76170f;--navy-dark:#570b07;--rose:#b55649;
+      --green:#e5f2e8;--amber:#fff1cc;--red:#f8dfdc;--blue:#f2e4e1;
+      --soft:#f7f7f8;--soft-strong:#ececee;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    header{position:sticky;top:0;z-index:5;padding:14px 16px;background:rgba(239,232,216,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-    header h1{margin:0;font-size:23px;letter-spacing:.08em}
+    body{margin:0;background:linear-gradient(145deg,#fafafa 0%,#f1f1f3 48%,#e8e8eb 100%);background-attachment:fixed;color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}
+    header{position:sticky;top:0;z-index:5;padding:14px 16px;background:rgba(247,247,249,.82);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid rgba(60,60,67,.12)}
+    header h1{margin:0;font-size:23px;letter-spacing:.06em;color:var(--navy)}
     header small{color:var(--muted)}
     main{max-width:920px;margin:auto;padding:14px}
-    .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:0 5px 18px rgba(0,0,0,.045)}
+    .card{background:var(--paper);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.72);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 34px rgba(40,20,20,.07)}
     h2{font-size:18px;margin:0 0 10px}
     h3{font-size:15px;margin:12px 0 6px}
     label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
     input,select,button{font:inherit}
-    input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white}
-    button{border:1px solid var(--navy);background:var(--navy);color:white;border-radius:11px;padding:10px 12px;font-weight:700}
-    button.secondary{background:transparent;color:var(--navy)}
+    input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.94);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.025)}
+    input:focus,select:focus{outline:3px solid rgba(181,86,73,.2);border-color:var(--rose)}
+    button{border:1px solid var(--navy);background:linear-gradient(180deg,#841c14 0%,var(--navy) 100%);color:white;border-radius:12px;padding:10px 13px;font-weight:700;box-shadow:0 2px 8px rgba(118,23,15,.16);transition:transform .12s ease,filter .12s ease}
+    button:active{transform:scale(.98)}
+    button:hover{filter:brightness(1.06)}
+    button.secondary{background:rgba(255,255,255,.74);color:var(--navy);box-shadow:none}
     button.danger{background:#8b3c3c;border-color:#8b3c3c}
     .tabs{display:flex;gap:7px;overflow:auto;padding-bottom:2px}
     .tab{white-space:nowrap;background:transparent;color:var(--navy)}
@@ -37,7 +41,7 @@
     @media(max-width:650px){.row,.row3{grid-template-columns:1fr}}
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
     .muted{color:var(--muted)}
-    .badge{display:inline-block;padding:3px 8px;border-radius:999px;background:#ebe3d3;margin:2px;font-size:12px}
+    .badge{display:inline-block;padding:3px 8px;border-radius:999px;background:var(--soft-strong);margin:2px;font-size:12px}
     .person{padding:10px 0;border-top:1px dashed var(--line)}
     .person:first-child{border-top:0}
     .slot{padding:11px;border:1px solid #a9c6a1;border-radius:12px;background:var(--green);margin:8px 0}
@@ -47,14 +51,14 @@
     .info{background:var(--blue)}
     .weekgrid{display:grid;grid-template-columns:78px repeat(5,minmax(92px,1fr));gap:4px;overflow:auto}
     .cell{min-height:38px;padding:6px;border:1px solid var(--line);border-radius:8px;background:white;font-size:12px}
-    .head,.time{background:#e7dfd0;font-weight:700;text-align:center}
+    .head,.time{background:var(--soft-strong);font-weight:700;text-align:center}
     hr{border:0;border-top:1px dashed var(--line);margin:14px 0}
     .switchline{display:flex;align-items:center;gap:8px}
     .switchline input{width:auto}
     .hidden{display:none !important}
-    .status{padding:10px;border-radius:11px;background:#eee7d9}
+    .status{padding:10px;border-radius:12px;background:var(--soft-strong)}
     .daily-card{border:1px solid var(--line);border-radius:16px;background:white;margin:10px 0;overflow:hidden}
-    .daily-head{padding:12px 14px;background:#ebe3d3;display:flex;justify-content:space-between;gap:10px}
+    .daily-head{padding:12px 14px;background:linear-gradient(110deg,#f7e9e6 0%,#f1f1f3 100%);display:flex;justify-content:space-between;gap:10px}
     .daily-title{font-size:17px;font-weight:800}
     .daily-meta{font-size:12px;color:var(--muted)}
     .patient-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px}
@@ -67,22 +71,35 @@
     @media(max-width:620px){.agenda-grid{grid-template-columns:1fr}}
     .agenda-applied{opacity:.55}
     .planning-day{margin:14px 0}
-    .planning-item{padding:9px 10px;border-radius:10px;background:#eee7d9;margin:6px 0}
+    .planning-item{padding:9px 10px;border-radius:10px;background:var(--soft-strong);margin:6px 0}
     .planning-free{background:var(--green)}
-    .main-nav{position:fixed;left:14px;top:86px;width:170px;z-index:12;margin:0;padding:9px}
+    .main-nav{position:fixed;left:14px;top:86px;width:170px;z-index:12;margin:0;padding:9px;background:rgba(255,255,255,.78)}
     .main-nav .tabs{display:grid;overflow:visible}
-    .main-nav .tab{text-align:left;width:100%}
-    .daily-sticky{position:sticky;top:72px;z-index:4;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}
-    .toast{position:fixed;right:20px;bottom:20px;z-index:30;max-width:340px;padding:12px 16px;border-radius:12px;background:var(--navy);color:white;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+    .main-nav .tab{display:flex;align-items:center;gap:9px;text-align:left;width:100%}
+    .nav-icon{width:21px;height:21px;display:block;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .daily-sticky{position:sticky;top:72px;z-index:4;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);padding:10px 0;border-bottom:1px solid var(--line)}
+    .daily-toolbar{display:grid;grid-template-columns:44px 44px minmax(0,1fr) 44px;gap:8px;align-items:end}
+    .daily-toolbar label{grid-column:3;margin:0 0 -4px}
+    .daily-toolbar select{grid-column:3;grid-row:2;min-width:0;height:44px}
+    .daily-toolbar button{grid-row:2;width:44px;height:44px;padding:0;display:grid;place-items:center;font-size:25px;line-height:1}
+    .daily-add{grid-column:1}
+    .daily-prev{grid-column:2}
+    .daily-next{grid-column:4}
+    .toast{position:fixed;right:20px;bottom:20px;z-index:30;max-width:340px;padding:12px 16px;border-radius:14px;background:var(--navy);color:white;box-shadow:0 12px 34px rgba(87,11,7,.24)}
     details.settings>summary{cursor:pointer;font-weight:800;color:var(--navy)}
     @media(min-width:901px){body{padding-left:198px}header{margin-left:-198px;padding-left:214px}}
     @media(max-width:900px){
       body{padding-bottom:84px}
       main{padding:10px}
       .main-nav{left:0;right:0;top:auto;bottom:0;width:auto;border-radius:16px 16px 0 0;padding:7px calc(7px + env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) calc(7px + env(safe-area-inset-left));background:var(--paper)}
-      .main-nav .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-      .main-nav .tab{text-align:center;padding:8px 3px;font-size:12px;border:0}
+      .main-nav .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+      .main-nav .tab{justify-content:center;text-align:center;padding:9px 3px;border:0;min-height:48px}
+      .main-nav .nav-label{display:none}
+      .main-nav .nav-icon{width:26px;height:26px}
       .daily-sticky{top:70px}
+      .daily-toolbar{grid-template-columns:42px 42px minmax(0,1fr) 42px;gap:6px}
+      .daily-toolbar button{width:42px;height:42px}
+      .daily-toolbar select{height:42px;padding-left:9px;padding-right:24px}
       .toast{left:12px;right:12px;bottom:92px;max-width:none}
     }
   </style>
@@ -90,16 +107,23 @@
 <body>
 <header>
   <h1>✈ ATC</h1>
-  <small>Tour de contrôle des entretiens · v7.3</small>
+  <small>Tour de contrôle des entretiens · v9</small>
 </header>
 <main>
   <div class="card main-nav">
     <div class="tabs">
-      <button class="tab active" data-tab="daily">☀️ Quotidien</button>
-      <button class="tab" data-tab="import">📅 Semaine</button>
-      <button class="tab" data-tab="patients">👤 Patients</button>
-      <button class="tab" data-tab="search">🔎 Recherche</button>
-      <button class="tab" data-tab="more">••• Plus</button>
+      <button class="tab active" data-tab="daily" aria-label="Quotidien" title="Quotidien">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg>
+        <span class="nav-label">Quotidien</span>
+      </button>
+      <button class="tab" data-tab="import" aria-label="Semaine" title="Semaine">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
+        <span class="nav-label">Semaine</span>
+      </button>
+      <button class="tab" data-tab="more" aria-label="Plus" title="Plus">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.25" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.25" fill="currentColor" stroke="none"></circle><circle cx="19" cy="12" r="1.25" fill="currentColor" stroke="none"></circle></svg>
+        <span class="nav-label">Plus</span>
+      </button>
     </div>
   </div>
 
@@ -111,15 +135,13 @@
       <div id="dailyDays" class="tabs" style="margin-top:10px"></div>
     </div>
     <div class="card">
-      <div class="actions" style="margin-top:0">
-        <button class="secondary" onclick="activateTab('workshops')">+ Activité ponctuelle</button>
-      </div>
       <div class="daily-sticky">
-        <label for="dailyActivitySelect">Activité du jour</label>
-        <select id="dailyActivitySelect" onchange="selectDailyActivity(this.value)"></select>
-        <div class="actions">
-          <button class="secondary" onclick="moveDailyActivity(-1)">‹ Précédente</button>
-          <button class="secondary" onclick="moveDailyActivity(1)">Suivante ›</button>
+        <div class="daily-toolbar">
+          <button class="secondary daily-add" onclick="activateTab('workshops')" aria-label="Ajouter une activité ponctuelle" title="Ajouter une activité ponctuelle">+</button>
+          <button class="secondary daily-prev" onclick="moveDailyActivity(-1)" aria-label="Activité précédente" title="Activité précédente">‹</button>
+          <label for="dailyActivitySelect">Activité du jour</label>
+          <select id="dailyActivitySelect" onchange="selectDailyActivity(this.value)"></select>
+          <button class="secondary daily-next" onclick="moveDailyActivity(1)" aria-label="Activité suivante" title="Activité suivante">›</button>
         </div>
       </div>
       <div id="dailyActivities"></div>
@@ -305,6 +327,8 @@
     <div class="card">
       <h2>Plus</h2>
       <div class="actions">
+        <button onclick="activateTab('patients')">Patients</button>
+        <button class="secondary" onclick="activateTab('search')">Recherche</button>
         <button onclick="activateTab('workshops')">Ateliers</button>
         <button class="secondary" onclick="activateTab('data')">Données et sauvegardes</button>
       </div>
