@@ -44,3 +44,20 @@ Version 7.3 :
 - sauvegarde automatique avant import et annulation du dernier import ;
 - récapitulatif compact des données manquantes.
 - lecteur Google Agenda inchangé dans cette première version.
+ATC v7.4 — Nouvelle identité visuelle
+
+- Palette bordeaux inspirée de la référence fournie
+- Fonds blanc et gris perle à la place du beige crème
+- Cartes translucides, ombres douces et angles plus arrondis
+- Navigation adaptée sur Mac et iPhone
+- Icône de l’application recolorée
+- Aucune modification fonctionnelle par rapport à la v7.3
+ATC v9 — Quotidien et navigation simplifiés
+
+- Commandes du Quotidien réunies sur une seule ligne
+- Bouton d’activité ponctuelle réduit au signe +
+- Navigation entre activités avec deux flèches compactes
+- Barre iPhone limitée à Quotidien, Semaine et Plus
+- Pictogrammes vectoriels bordeaux à la place des émojis
+- Patients et Recherche déplacés dans le menu Plus
+- Libellés conservés dans la navigation sur ordinateur
