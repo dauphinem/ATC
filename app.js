@@ -1,306 +1,27 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="theme-color" content="#efe8d8">
-  <link rel="manifest" href="manifest.webmanifest">
-  <title>ATC</title>
-  <style>
-    :root{
-      --bg:#efe8d8;--paper:#fffaf0;--ink:#25282a;--muted:#6f706d;
-      --line:#cfc5b4;--navy:#314755;--green:#dcebd8;--amber:#f5e5b3;
-      --red:#efd1cc;--blue:#dce6ee;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    header{position:sticky;top:0;z-index:5;padding:14px 16px;background:rgba(239,232,216,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-    header h1{margin:0;font-size:23px;letter-spacing:.08em}
-    header small{color:var(--muted)}
-    main{max-width:920px;margin:auto;padding:14px}
-    .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:0 5px 18px rgba(0,0,0,.045)}
-    h2{font-size:18px;margin:0 0 10px}
-    h3{font-size:15px;margin:12px 0 6px}
-    label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
-    input,select,button{font:inherit}
-    input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white}
-    button{border:1px solid var(--navy);background:var(--navy);color:white;border-radius:11px;padding:10px 12px;font-weight:700}
-    button.secondary{background:transparent;color:var(--navy)}
-    button.danger{background:#8b3c3c;border-color:#8b3c3c}
-    .tabs{display:flex;gap:7px;overflow:auto;padding-bottom:2px}
-    .tab{white-space:nowrap;background:transparent;color:var(--navy)}
-    .tab.active{background:var(--navy);color:white}
-    .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    @media(max-width:650px){.row,.row3{grid-template-columns:1fr}}
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .muted{color:var(--muted)}
-    .badge{display:inline-block;padding:3px 8px;border-radius:999px;background:#ebe3d3;margin:2px;font-size:12px}
-    .person{padding:10px 0;border-top:1px dashed var(--line)}
-    .person:first-child{border-top:0}
-    .slot{padding:11px;border:1px solid #a9c6a1;border-radius:12px;background:var(--green);margin:8px 0}
-    .conflict{padding:10px;border:1px solid #d6aaa2;border-radius:12px;background:var(--red);margin:8px 0}
-    .ok{background:var(--green)}
-    .warn{background:var(--amber)}
-    .info{background:var(--blue)}
-    .weekgrid{display:grid;grid-template-columns:78px repeat(5,minmax(92px,1fr));gap:4px;overflow:auto}
-    .cell{min-height:38px;padding:6px;border:1px solid var(--line);border-radius:8px;background:white;font-size:12px}
-    .head,.time{background:#e7dfd0;font-weight:700;text-align:center}
-    hr{border:0;border-top:1px dashed var(--line);margin:14px 0}
-    .switchline{display:flex;align-items:center;gap:8px}
-    .switchline input{width:auto}
-    .hidden{display:none !important}
-    .status{padding:10px;border-radius:11px;background:#eee7d9}
-    .daily-card{border:1px solid var(--line);border-radius:16px;background:white;margin:10px 0;overflow:hidden}
-    .daily-head{padding:12px 14px;background:#ebe3d3;display:flex;justify-content:space-between;gap:10px}
-    .daily-title{font-size:17px;font-weight:800}
-    .daily-meta{font-size:12px;color:var(--muted)}
-    .patient-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px}
-    @media(max-width:520px){.patient-grid{grid-template-columns:1fr}}
-    .patient-check{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font-weight:650}
-    .patient-check input{width:22px;height:22px}
-    .patient-check.checked{background:var(--green);border-color:#a9c6a1}
-    .agenda-event{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:white}
-    .agenda-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:8px;margin-top:10px}
-    @media(max-width:620px){.agenda-grid{grid-template-columns:1fr}}
-    .agenda-applied{opacity:.55}
-    .planning-day{margin:14px 0}
-    .planning-item{padding:9px 10px;border-radius:10px;background:#eee7d9;margin:6px 0}
-    .planning-free{background:var(--green)}
-  </style>
-</head>
-<body>
-<header>
-  <h1>✈ ATC</h1>
-  <small>Tour de contrôle des entretiens · v1.0-dev6.2</small>
-</header>
-<main>
-  <div class="card">
-    <div class="tabs">
-      <button class="tab active" data-tab="daily">Quotidien</button>
-      <button class="tab" data-tab="import">Tableau de bord</button>
-      <button class="tab" data-tab="patients">Patients</button>
-      <button class="tab" data-tab="workshops">Ateliers</button>
-      <button class="tab" data-tab="search">Recherche</button>
-      <button class="tab" data-tab="data">Données</button>
-    </div>
-  </div>
-
-  
-  <section id="daily" class="panel">
-    <div class="card">
-      <h2>Quotidien</h2>
-      <div id="dailyDate" class="muted"></div>
-      <div id="dailyDays" class="tabs" style="margin-top:10px"></div>
-    </div>
-    <div class="card">
-      <div class="actions" style="margin-top:0">
-        <button class="secondary" onclick="activateTab('workshops')">+ Activité ponctuelle</button>
-      </div>
-      <div id="dailyActivities"></div>
-    </div>
-  </section>
-
-<section id="import" class="panel hidden">
-    <div class="card">
-      <h2>Tableau de bord</h2>
-      <p class="muted">Toutes les données de la semaine sont regroupées ici.</p>
-      <div id="dashboardSummary"></div>
-    </div>
-
-    <div class="card">
-      <h2>1. Planning IDE</h2>
-      <p class="muted">Importe le fichier Excel des soignants.</p>
-      <input id="excelFile" type="file" accept=".xls,.xlsx">
-      <div class="actions"><button onclick="importExcel()">Importer le planning IDE</button></div>
-      <div id="importStatus" class="status muted" style="margin-top:10px">Aucun fichier importé.</div>
-    </div>
-
-    <div class="card">
-      <h2>2. Planning des ateliers</h2>
-      <p class="muted">Colonnes attendues : Jour, Début, Fin, Atelier.</p>
-      <input id="workshopExcelFileDashboard" type="file" accept=".xls,.xlsx">
-      <div class="actions"><button onclick="importWorkshopsFromDashboard()">Importer les ateliers</button></div>
-      <div id="dashboardWorkshopStatus" class="status muted" style="margin-top:10px">Aucun tableau importé.</div>
-    </div>
-
-    <div class="card">
-      <h2>3. Google Agenda</h2>
-      <p class="muted">Importe le fichier .ics. ATC garde seulement les événements de la semaine en cours.</p>
-      <input id="icsFile" type="file" accept=".ics,text/calendar">
-      <div class="actions">
-        <button onclick="importICS()">Analyser le fichier ICS</button>
-        <button class="secondary" onclick="clearAgendaDraft()">Effacer l’analyse</button>
-      </div>
-      <div id="icsStatus" class="status muted" style="margin-top:10px">Aucun fichier analysé.</div>
-    </div>
-
-    <div class="card">
-      <h2>Vérifier les événements Google Agenda</h2>
-      <p class="muted">Corrige seulement les cas ambigus, puis valide.</p>
-      <div class="actions"><button onclick="applyAllAgendaEvents()">Valider tous les événements prêts</button></div>
-      <div id="agendaReview" style="margin-top:10px"></div>
-    </div>
-
-    <div class="card">
-      <h2>Options de la semaine</h2>
-      <label class="switchline"><input id="weekBibliography" type="checkbox" onchange="toggleWeekOption('bibliography',this.checked)"> Bibliographie lundi 11 h–12 h</label>
-      <label class="switchline" style="margin-top:10px"><input id="weekClinicalCase" type="checkbox" onchange="toggleWeekOption('clinicalCase',this.checked)"> Cas clinique jeudi 11 h–12 h</label>
-    </div>
-
-    <div class="card">
-      <h2>Équilibre des activités</h2>
-      <div id="activityBalance"></div>
-    </div>
-
-    <div class="card">
-      <h2>Règles de présence IDE</h2>
-      <div class="row3">
-        <div><label>M</label><input value="07:30–15:30" disabled></div>
-        <div><label>S</label><input value="13:00–20:30" disabled></div>
-        <div><label>J</label><input value="09:00–17:00" disabled></div>
-        <div><label>12</label><input value="Toute la journée" disabled></div>
-        <div><label>C / STH / vide</label><input value="Indisponible" disabled></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="patients" class="panel hidden">
-    <div class="card">
-      <h2 id="patientFormTitle">Ajouter un patient</h2>
-      <div class="row">
-        <div><label>Indicatif patient</label><input id="pCode" placeholder="Charlie12"></div>
-        <div><label>IDE référent 1</label><select id="pNurse"></select></div>
-        <div><label>IDE référent 2</label><select id="pNurse2"></select></div>
-        <div><label>Interne référent 1</label><select id="pIntern"></select></div>
-        <div><label>Interne référent 2</label><select id="pIntern2"></select></div>
-        <div class="switchline"><input id="pSep" type="checkbox"><label for="pSep" style="margin:0">Patient en séparation</label></div>
-        <div class="switchline"><input id="pTca" type="checkbox"><label for="pTca" style="margin:0">Patient TCA</label></div>
-      </div>
-      <div class="actions">
-        <button id="patientSaveButton" onclick="savePatientForm()">Ajouter</button>
-        <button id="patientCancelButton" class="secondary hidden" onclick="cancelPatientEdit()">Annuler la modification</button>
-      </div>
-    </div>
-    <div class="card" id="patientListCard">
-      <h2>Patients</h2>
-      <div id="patientList"></div>
-    </div>
-    <div id="patientDetailCard" class="card hidden">
-      <div class="actions" style="margin-top:0">
-        <button class="secondary" onclick="closePatientDetail()">← Retour à la liste</button>
-      </div>
-      <div id="patientDetail"></div>
-    </div>
-  </section>
-
-  
-  <section id="workshops" class="panel hidden">
-    <input id="workshopExcelFile" type="file" accept=".xls,.xlsx" class="hidden">
-    <div id="workshopImportStatus" class="hidden"></div>
-    <div class="card">
-      <h2>Créer un atelier ponctuel</h2>
-      <p class="muted">Ajoute l’atelier une seule fois, puis coche les patients inscrits. Leur indisponibilité sera créée automatiquement.</p>
-      <div class="row">
-        <div><label>Nom de l’atelier</label><input id="wTitle" placeholder="Théâtre d’objets"></div>
-        <div><label>Jour</label><select id="wDay"></select></div>
-        <div><label>Début</label><input id="wStart" type="time" step="900" value="14:00"></div>
-        <div><label>Fin</label><input id="wEnd" type="time" step="900" value="15:00"></div>
-        <div><label>Intervenant (facultatif)</label><input id="wLeader" placeholder="Valentine"></div>
-        <div><label>Catégorie</label>
-          <select id="wCategory">
-            <option value="">Non classé</option>
-            <option value="art-therapie">Art-thérapie</option>
-            <option value="corporel">Corporel</option>
-            <option value="autre">Autre</option>
-          </select>
-        </div>
-        <div><label>Nombre de places (facultatif)</label><input id="wCapacity" type="number" min="1" placeholder="6"></div>
-      </div>
-      <div class="actions"><button onclick="addWorkshop()">Créer l’atelier</button></div>
-    </div>
-
-    <div class="card">
-      <h2>Ateliers de la semaine</h2>
-      <div id="workshopList"></div>
-    </div>
-  </section>
-
-  <section id="search" class="panel hidden">
-    <div class="card">
-      <h2>Je dois voir un patient</h2>
-      <div class="row">
-        <div><label>Patient</label><select id="sPatient"></select></div>
-        <div><label>Jour</label><select id="sDay"><option value="">Toute la semaine</option></select></div>
-      </div>
-      <div class="actions"><button onclick="findForPatient()">Trouver les créneaux</button></div>
-      <div id="patientResults" style="margin-top:10px" class="muted">Aucune recherche lancée.</div>
-    </div>
-
-    <div class="card">
-      <h2>J’ai un créneau libre</h2>
-      <div class="row">
-        <div><label>Jour</label><select id="fDay"></select></div>
-        <div><label>Heure</label><input id="fTime" type="time" step="1800" value="14:00"></div>
-      </div>
-      <div class="actions"><button onclick="findPatientsForSlot()">Quels patients puis-je voir ?</button></div>
-      <div id="slotResults" style="margin-top:10px" class="muted">Aucune recherche lancée.</div>
-    </div>
-  </section>
-
-  <section id="data" class="panel hidden">
-    <div class="card">
-      <h2>Sauvegarde</h2>
-      <p class="muted">Les données sont enregistrées localement dans ce navigateur.</p>
-      <div class="actions">
-        <button class="secondary" onclick="exportData()">Exporter</button>
-        <label><span class="badge">Importer une sauvegarde</span><input id="backupFile" type="file" accept=".json" class="hidden" onchange="importBackup(event)"></label>
-        <button class="danger" onclick="resetAll()">Tout effacer</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script>
 const DAYS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi"];
 const DAY_CODES={L:"Lundi",M:"Mardi",ME:"Mercredi",J:"Jeudi",V:"Vendredi",S:"Samedi",D:"Dimanche"};
 const SHIFT={
   "M":["07:30","15:30"], "S":["13:00","20:30"], "J":["09:00","17:00"],
   "12":["00:00","23:59"]
 };
-const DB_KEY="atc_v10dev6";
-function freshDb(){
- return {me:"Dauphine",nurses:[],interns:[{id:"intern-matthieu",name:"Matthieu"},{id:"intern-nada",name:"Nada"}],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false}};
-}
-function loadDb(){
- try{
-   const stored=JSON.parse(localStorage.getItem(DB_KEY)||"null");
-   const data=stored&&typeof stored==="object"?stored:freshDb();
-   data.me="Dauphine";
-   for(const key of ["nurses","interns","patients","constraints","workshops","dates","agendaDraft"]){
-     if(!Array.isArray(data[key])) data[key]=[];
-   }
-   const legacyInterns=data.interns;
-   const matthieu=legacyInterns.find(i=>String(i.name||"").trim().toLocaleLowerCase("fr")==="matthieu");
-   const nada=legacyInterns.find(i=>String(i.name||"").trim().toLocaleLowerCase("fr")==="nada");
-   data.interns=[
-     {id:matthieu?.id||"intern-matthieu",name:"Matthieu"},
-     {id:nada?.id||"intern-nada",name:"Nada"}
-   ];
-   if(!data.weekOptions||typeof data.weekOptions!=="object") data.weekOptions={};
-   data.weekOptions.bibliography=!!data.weekOptions.bibliography;
-   data.weekOptions.clinicalCase=!!data.weekOptions.clinicalCase;
-   return data;
- }catch(error){
-   console.warn("Données locales illisibles, démarrage avec une base vide.",error);
-   return freshDb();
- }
-}
-let db=loadDb();
-function save(){localStorage.setItem(DB_KEY,JSON.stringify(db));render()}
+let db=JSON.parse(localStorage.getItem("atc_v10modular")||'{"me":"Dauphine","nurses":[],"interns":[{"id":"intern-matthieu","name":"Matthieu"},{"id":"intern-nada","name":"Nada"}],"patients":[],"constraints":[],"workshops":[],"dates":[],"importedAt":null,"weekOptions":{"bibliography":false,"clinicalCase":false},"baseWorkshopsLoaded":false,"selectedDay":null,"agendaDraft":[]}');
+if(!db || typeof db!=="object") db={};
+db.me="Dauphine";
+if(!Array.isArray(db.nurses)) db.nurses=[];
+if(!Array.isArray(db.interns)) db.interns=[];
+if(!Array.isArray(db.patients)) db.patients=[];
+if(!Array.isArray(db.constraints)) db.constraints=[];
+if(!Array.isArray(db.workshops)) db.workshops=[];
+if(!Array.isArray(db.dates)) db.dates=[];
+if(!Array.isArray(db.agendaDraft)) db.agendaDraft=[];
+if(!db.weekOptions || typeof db.weekOptions!=="object") db.weekOptions={bibliography:false,clinicalCase:false};
+if(typeof (db.weekOptions?.bibliography||false)!=="boolean") (db.weekOptions?.bibliography||false)=false;
+if(typeof (db.weekOptions?.clinicalCase||false)!=="boolean") (db.weekOptions?.clinicalCase||false)=false;
+if(typeof db.baseWorkshopsLoaded!=="boolean") db.baseWorkshopsLoaded=false;
+if(!("selectedDay" in db)) db.selectedDay=null;
+if(!db.interns.some(i=>i.name==="Matthieu")) db.interns.push({id:"intern-matthieu",name:"Matthieu"});
+if(!db.interns.some(i=>i.name==="Nada")) db.interns.push({id:"intern-nada",name:"Nada"});
+function save(){localStorage.setItem("atc_v10modular",JSON.stringify(db));render()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m}
 function toTime(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
@@ -531,7 +252,10 @@ async function importExcel(){
   importStatus.innerHTML=`<strong>${nurses.length} IDE détectés</strong><br>${dateColumns.length} journées de semaine reconnues dans ${esc(f.name)}.`;
 }
 
+function saveMe(){db.me=(meName.value.trim()||"Moi");save()}
+function addIntern(){const n=internName.value.trim();if(!n)return;db.interns.push({id:crypto.randomUUID(),name:n});internName.value="";save()}
 function renameNurse(id,val){const n=db.nurses.find(x=>x.id===id);if(n){n.alias=val.trim()||n.original;save()}}
+function removeIntern(id){db.interns=db.interns.filter(x=>x.id!==id);save()}
 
 let selectedPatientId=null;
 let editingPatientId=null;
@@ -755,9 +479,9 @@ function ensureBaseWorkshops(){
    });
  });
  db.baseWorkshopsLoaded=true;
- localStorage.setItem(DB_KEY,JSON.stringify(db));
+ localStorage.setItem("atc_v10modular",JSON.stringify(db));
 }
-function toggleWeekOption(key,checked){db.weekOptions[key]=checked;save()}
+function toggleWeekOption(key,checked){if(!db.weekOptions)db.weekOptions={bibliography:false,clinicalCase:false};db.weekOptions[key]=checked;save()}
 
 function addWorkshop(){
  const title=wTitle.value.trim(),day=wDay.value,start=wStart.value,end=wEnd.value;
@@ -826,8 +550,8 @@ function evaluate(p,day,start,end){
  const intern=internById(p.internId), intern2=internById(p.internId2);
  const reasons=[];
  if(!(nursePresent(nurse,day,start,end)||nursePresent(nurse2,day,start,end))) reasons.push("Aucun IDE référent présent");
- if(db.weekOptions.bibliography && day==="Lundi" && overlap(start,end,"11:00","12:00")) reasons.push(`${db.me} : Bibliographie`);
- if(db.weekOptions.clinicalCase && day==="Jeudi" && overlap(start,end,"11:00","12:00")) reasons.push(`${db.me} : Cas clinique`);
+ if((db.weekOptions?.bibliography||false) && day==="Lundi" && overlap(start,end,"11:00","12:00")) reasons.push(`${db.me} : Bibliographie`);
+ if((db.weekOptions?.clinicalCase||false) && day==="Jeudi" && overlap(start,end,"11:00","12:00")) reasons.push(`${db.me} : Cas clinique`);
  const entities=[["me",db.me], [p.id,p.code]];
  for(const [id,name] of entities){
    if(!id) continue;
@@ -874,12 +598,15 @@ function importBackup(e){
  const f=e.target.files[0];if(!f)return;
  const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save()}catch{alert("Sauvegarde invalide.")}};r.readAsText(f)
 }
-function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem(DB_KEY);location.reload()}}
+function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem("atc_v10modular");location.reload()}}
 function render(){
+ meName.value=db.me||"Moi";
  if(typeof workshopImportStatus!=="undefined" && db.workshops.length){
    workshopImportStatus.innerHTML=`<strong>${db.workshops.length} atelier(s) enregistré(s)</strong><br><span class="muted">Tu peux importer un nouveau tableau ou ajouter un atelier ponctuel.</span>`;
  }
  importStatus.innerHTML=db.importedAt?`<strong>${db.nurses.length} IDE importés</strong><br>Dernier import : ${new Date(db.importedAt).toLocaleString("fr-FR")}`:"Aucun fichier importé.";
+ nurseList.innerHTML=db.nurses.length?db.nurses.map(n=>`<div class="person"><label>${esc(n.original)}</label><input value="${esc(n.alias)}" onchange="renameNurse('${n.id}',this.value)"></div>`).join(""):"Aucun IDE importé.";
+ internList.innerHTML=db.interns.length?db.interns.map(i=>`<div class="person"><strong>${esc(i.name)}</strong> <button class="secondary" onclick="removeIntern('${i.id}')">Supprimer</button></div>`).join(""):"Aucun interne.";
  pNurse.innerHTML=db.nurses.map(n=>`<option value="${n.id}">${esc(n.alias)}</option>`).join("");
  pNurse2.innerHTML='<option value="">Aucun second IDE</option>'+db.nurses.map(n=>`<option value="${n.id}">${esc(n.alias)}</option>`).join("");
  pIntern.innerHTML=db.interns.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join("");
@@ -895,11 +622,28 @@ function render(){
      <button class="danger" onclick="removePatient('${p.id}')">Supprimer</button>
    </div></div>`
  }).join(""):"Aucun patient.";
+ const adults=adultOptions();
  const patients=patientOptions();
+ const ppl=[...adults,...patients];
+ if(typeof acPerson!=="undefined") acPerson.innerHTML=adults.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.type}</option>`).join("");
+ if(typeof pcPatient!=="undefined") pcPatient.innerHTML=patients.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");
+ if(typeof acDay!=="undefined") acDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
+ if(typeof pcDay!=="undefined") pcDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  wDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sDay.innerHTML='<option value="">Toute la semaine</option>'+DAYS.map(d=>`<option>${d}</option>`).join("");
  fDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sPatient.innerHTML=db.patients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
+ const visibleConstraints=db.constraints.filter(c=>{
+   const inferredKind=c.kind || (db.patients.some(p=>p.id===c.personId)?"patient":"adult");
+   return constraintFilter==="all" || inferredKind===constraintFilter;
+ });
+ if(typeof constraintList!=="undefined") constraintList.innerHTML=visibleConstraints.length?visibleConstraints.map(c=>{
+   const name=ppl.find(x=>x.id===c.personId)?.name||"?";
+   const inferredKind=c.kind || (db.patients.some(p=>p.id===c.personId)?"patient":"adult");
+   const kindLabel=inferredKind==="patient"?"Patient":"Adulte";
+   return `<div class="person"><strong>${esc(name)}</strong> <span class="badge">${kindLabel}</span><br>${esc(c.day)} ${c.start}–${c.end} <span class="badge">${esc(c.reason)}</span> <button class="secondary" onclick="removeConstraint('${c.id}')">Supprimer</button></div>`
+ }).join(""):"Aucune contrainte dans ce filtre.";
+
  const sortedWorkshops=[...db.workshops].sort((a,b)=>{
    const da=DAYS.indexOf(a.day),dbi=DAYS.indexOf(b.day);
    return da-dbi || a.start.localeCompare(b.start);
@@ -953,8 +697,8 @@ function render(){
    </div>`).join(""):"<div class='muted'>Aucun événement à vérifier.</div>";
 
  if(typeof weekBibliography!=="undefined"){
-   weekBibliography.checked=!!db.weekOptions.bibliography;
-   weekClinicalCase.checked=!!db.weekOptions.clinicalCase;
+   weekBibliography.checked=!!(db.weekOptions?.bibliography||false);
+   weekClinicalCase.checked=!!(db.weekOptions?.clinicalCase||false);
  }
  if(typeof activityBalance!=="undefined"){
    const noArt=db.patients.filter(p=>!db.workshops.some(w=>w.patientIds.includes(p.id)&&w.category==="art-therapie")).map(p=>p.code);
@@ -978,6 +722,3 @@ function render(){
 ensureBaseWorkshops();
 render();
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
-</script>
-</body>
-</html>

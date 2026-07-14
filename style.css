@@ -1,0 +1,60 @@
+:root{
+      --bg:#efe8d8;--paper:#fffaf0;--ink:#25282a;--muted:#6f706d;
+      --line:#cfc5b4;--navy:#314755;--green:#dcebd8;--amber:#f5e5b3;
+      --red:#efd1cc;--blue:#dce6ee;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    header{position:sticky;top:0;z-index:5;padding:14px 16px;background:rgba(239,232,216,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    header h1{margin:0;font-size:23px;letter-spacing:.08em}
+    header small{color:var(--muted)}
+    main{max-width:920px;margin:auto;padding:14px}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:0 5px 18px rgba(0,0,0,.045)}
+    h2{font-size:18px;margin:0 0 10px}
+    h3{font-size:15px;margin:12px 0 6px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+    input,select,button{font:inherit}
+    input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white}
+    button{border:1px solid var(--navy);background:var(--navy);color:white;border-radius:11px;padding:10px 12px;font-weight:700}
+    button.secondary{background:transparent;color:var(--navy)}
+    button.danger{background:#8b3c3c;border-color:#8b3c3c}
+    .tabs{display:flex;gap:7px;overflow:auto;padding-bottom:2px}
+    .tab{white-space:nowrap;background:transparent;color:var(--navy)}
+    .tab.active{background:var(--navy);color:white}
+    .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    @media(max-width:650px){.row,.row3{grid-template-columns:1fr}}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .muted{color:var(--muted)}
+    .badge{display:inline-block;padding:3px 8px;border-radius:999px;background:#ebe3d3;margin:2px;font-size:12px}
+    .person{padding:10px 0;border-top:1px dashed var(--line)}
+    .person:first-child{border-top:0}
+    .slot{padding:11px;border:1px solid #a9c6a1;border-radius:12px;background:var(--green);margin:8px 0}
+    .conflict{padding:10px;border:1px solid #d6aaa2;border-radius:12px;background:var(--red);margin:8px 0}
+    .ok{background:var(--green)}
+    .warn{background:var(--amber)}
+    .info{background:var(--blue)}
+    .weekgrid{display:grid;grid-template-columns:78px repeat(5,minmax(92px,1fr));gap:4px;overflow:auto}
+    .cell{min-height:38px;padding:6px;border:1px solid var(--line);border-radius:8px;background:white;font-size:12px}
+    .head,.time{background:#e7dfd0;font-weight:700;text-align:center}
+    hr{border:0;border-top:1px dashed var(--line);margin:14px 0}
+    .switchline{display:flex;align-items:center;gap:8px}
+    .switchline input{width:auto}
+    .hidden{display:none !important}
+    .status{padding:10px;border-radius:11px;background:#eee7d9}
+    .daily-card{border:1px solid var(--line);border-radius:16px;background:white;margin:10px 0;overflow:hidden}
+    .daily-head{padding:12px 14px;background:#ebe3d3;display:flex;justify-content:space-between;gap:10px}
+    .daily-title{font-size:17px;font-weight:800}
+    .daily-meta{font-size:12px;color:var(--muted)}
+    .patient-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px}
+    @media(max-width:520px){.patient-grid{grid-template-columns:1fr}}
+    .patient-check{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font-weight:650}
+    .patient-check input{width:22px;height:22px}
+    .patient-check.checked{background:var(--green);border-color:#a9c6a1}
+    .agenda-event{border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;background:white}
+    .agenda-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:8px;margin-top:10px}
+    @media(max-width:620px){.agenda-grid{grid-template-columns:1fr}}
+    .agenda-applied{opacity:.55}
+    .planning-day{margin:14px 0}
+    .planning-item{padding:9px 10px;border-radius:10px;background:#eee7d9;margin:6px 0}
+    .planning-free{background:var(--green)}

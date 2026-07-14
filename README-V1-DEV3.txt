@@ -7,5 +7,5 @@ Nouveauté :
 - ATC affiche le nombre d'événements retenus et ignorés.
 
 Installation :
-- Remplacer index.html et sw.js
-- Recharger http://localhost:8000 avec Cmd + Shift + R
+- Remplacer index.http://localhost:8000 html et sw.js
+- Recharger avec Cmd + Shift + R
