@@ -69,22 +69,37 @@
     .planning-day{margin:14px 0}
     .planning-item{padding:9px 10px;border-radius:10px;background:#eee7d9;margin:6px 0}
     .planning-free{background:var(--green)}
+    .main-nav{position:fixed;left:14px;top:86px;width:170px;z-index:12;margin:0;padding:9px}
+    .main-nav .tabs{display:grid;overflow:visible}
+    .main-nav .tab{text-align:left;width:100%}
+    .daily-sticky{position:sticky;top:72px;z-index:4;background:var(--paper);padding:10px 0;border-bottom:1px solid var(--line)}
+    .toast{position:fixed;right:20px;bottom:20px;z-index:30;max-width:340px;padding:12px 16px;border-radius:12px;background:var(--navy);color:white;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+    details.settings>summary{cursor:pointer;font-weight:800;color:var(--navy)}
+    @media(min-width:901px){body{padding-left:198px}header{margin-left:-198px;padding-left:214px}}
+    @media(max-width:900px){
+      body{padding-bottom:84px}
+      main{padding:10px}
+      .main-nav{left:0;right:0;top:auto;bottom:0;width:auto;border-radius:16px 16px 0 0;padding:7px calc(7px + env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) calc(7px + env(safe-area-inset-left));background:var(--paper)}
+      .main-nav .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+      .main-nav .tab{text-align:center;padding:8px 3px;font-size:12px;border:0}
+      .daily-sticky{top:70px}
+      .toast{left:12px;right:12px;bottom:92px;max-width:none}
+    }
   </style>
 </head>
 <body>
 <header>
   <h1>✈ ATC</h1>
-  <small>Tour de contrôle des entretiens · v7.1</small>
+  <small>Tour de contrôle des entretiens · v7.3</small>
 </header>
 <main>
-  <div class="card">
+  <div class="card main-nav">
     <div class="tabs">
-      <button class="tab active" data-tab="daily">Quotidien</button>
-      <button class="tab" data-tab="import">Tableau de bord</button>
-      <button class="tab" data-tab="patients">Patients</button>
-      <button class="tab" data-tab="workshops">Ateliers</button>
-      <button class="tab" data-tab="search">Recherche</button>
-      <button class="tab" data-tab="data">Données</button>
+      <button class="tab active" data-tab="daily">☀️ Quotidien</button>
+      <button class="tab" data-tab="import">📅 Semaine</button>
+      <button class="tab" data-tab="patients">👤 Patients</button>
+      <button class="tab" data-tab="search">🔎 Recherche</button>
+      <button class="tab" data-tab="more">••• Plus</button>
     </div>
   </div>
 
@@ -99,6 +114,14 @@
       <div class="actions" style="margin-top:0">
         <button class="secondary" onclick="activateTab('workshops')">+ Activité ponctuelle</button>
       </div>
+      <div class="daily-sticky">
+        <label for="dailyActivitySelect">Activité du jour</label>
+        <select id="dailyActivitySelect" onchange="selectDailyActivity(this.value)"></select>
+        <div class="actions">
+          <button class="secondary" onclick="moveDailyActivity(-1)">‹ Précédente</button>
+          <button class="secondary" onclick="moveDailyActivity(1)">Suivante ›</button>
+        </div>
+      </div>
       <div id="dailyActivities"></div>
     </div>
   </section>
@@ -107,18 +130,24 @@
     <div class="card">
       <h2>Préparer la semaine</h2>
       <p class="muted">Sélectionne les quatre sources, puis lance une seule préparation.</p>
+      <div class="row">
+        <div><label for="weekStartInput">Semaine du lundi</label><input id="weekStartInput" type="date" onchange="setSelectedWeek(this.value)"></div>
+        <div class="actions"><button class="secondary" onclick="moveSelectedWeek(-1)">← Semaine précédente</button><button class="secondary" onclick="moveSelectedWeek(1)">Semaine suivante →</button></div>
+      </div>
+      <div id="selectedWeekLabel" class="status"></div>
       <div id="dashboardSummary"></div>
     </div>
 
     <div class="card">
       <div class="row">
-        <div><label>1. Liste des patients</label><input id="patientExcelFile" type="file" accept=".xls,.xlsx"><small class="muted">Patient, Interne 1, Interne 2, IDE 1, IDE 2, TCA, Séparation<br><a href="Modele_liste_patients_ATC_7_1.xlsx" download>Télécharger le modèle Excel</a></small></div>
+        <div><label>1. Liste des patients</label><input id="patientExcelFile" type="file" accept=".xls,.xlsx"><small class="muted">Patient, Interne 1, Interne 2, IDE 1, IDE 2, TCA, Séparation<br><a href="Modele_liste_patients_ATC_7_2.xlsx" download>Télécharger le modèle Excel</a></small></div>
         <div><label>2. Planning IDE</label><input id="excelFile" type="file" accept=".xls,.xlsx"></div>
         <div><label>3. Google Agenda</label><input id="icsFile" type="file" accept=".ics,text/calendar"></div>
         <div><label>4. Calendrier des ateliers</label><input id="workshopExcelFileDashboard" type="file" accept=".xls,.xlsx"><small class="muted">Jour, Début, Fin, Atelier</small></div>
       </div>
       <div class="actions">
         <button id="prepareWeekButton" onclick="prepareWeek()">Analyser et préparer la semaine</button>
+        <button id="undoImportButton" class="secondary" onclick="undoLastImport()">Annuler le dernier import</button>
       </div>
       <div id="weekPreparationStatus" class="status muted" style="margin-top:10px">Aucun nouvel import analysé.</div>
       <div id="importStatus" class="hidden"></div>
@@ -127,10 +156,31 @@
     </div>
 
     <div class="card">
+      <h2>État de la semaine</h2>
+      <div id="dataChecklist"></div>
+    </div>
+
+    <div class="card">
+      <details class="settings">
+        <summary>Semaines archivées — <span id="archivedWeekCount">0</span></summary>
+        <div id="archivedWeeks" style="margin-top:10px"></div>
+      </details>
+    </div>
+
+    <div class="card">
       <h2>Vérifier les événements Google Agenda</h2>
       <p class="muted">Corrige seulement les cas ambigus, puis valide.</p>
       <div class="actions"><button onclick="applyAllAgendaEvents()">Valider tous les événements prêts</button></div>
       <div id="agendaReview" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <details class="settings">
+        <summary>Règles Google Agenda — <span id="agendaRuleCount">5</span> configurées</summary>
+        <p class="muted">Les mots séparés par | doivent tous être présents dans le titre.</p>
+        <div id="agendaRules"></div>
+        <div class="actions"><button class="secondary" onclick="addAgendaRule()">+ Ajouter une règle</button></div>
+      </details>
     </div>
 
     <div class="card">
@@ -250,7 +300,18 @@
       </div>
     </div>
   </section>
+
+  <section id="more" class="panel hidden">
+    <div class="card">
+      <h2>Plus</h2>
+      <div class="actions">
+        <button onclick="activateTab('workshops')">Ateliers</button>
+        <button class="secondary" onclick="activateTab('data')">Données et sauvegardes</button>
+      </div>
+    </div>
+  </section>
 </main>
+<div id="toast" class="toast hidden" role="status"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
@@ -261,8 +322,22 @@ const SHIFT={
   "12":["00:00","23:59"]
 };
 const DB_KEY="atc_v10dev6";
+const DEFAULT_AGENDA_RULES=[
+ {id:"rule-psychod",keywords:"psychod",kind:"patient",label:"Psychodrame",category:"autre",leader:""},
+ {id:"rule-ech",keywords:"ech",kind:"patient",label:"Scolarité – cours individuel",category:"autre",leader:""},
+ {id:"rule-2d",keywords:"atelier|2d",kind:"activity",label:"Atelier 2D",category:"art-therapie",leader:"Sibyl"},
+ {id:"rule-mouvement",keywords:"mouvement|soi",kind:"activity",label:"Mouvement en soi",category:"corporel",leader:""},
+ {id:"rule-separation",keywords:"sortie|sepa",kind:"separation-end",label:"Fin de séparation",category:"autre",leader:""}
+];
+const WEEK_FIELDS=["nurses","patients","constraints","workshops","dates","importedAt","agendaDraft","weekOptions","selectedDay","selectedWorkshopByDay","dailyWarning","baseWorkshopsLoaded"];
+function defaultWeekKey(){
+ const now=new Date(),day=now.getDay(),diff=day===0?-6:1-day;
+ now.setHours(12,0,0,0);now.setDate(now.getDate()+diff);
+ return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+}
+function blankWeek(){return {nurses:[],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},selectedDay:defaultDay(),selectedWorkshopByDay:{},dailyWarning:"",baseWorkshopsLoaded:false}}
 function freshDb(){
- return {me:"Dauphine",nurses:[],interns:[{id:"intern-matthieu",name:"Matthieu"},{id:"intern-nada",name:"Nada"}],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false}};
+ return {me:"Dauphine",nurses:[],interns:[{id:"intern-matthieu",name:"Matthieu"},{id:"intern-nada",name:"Nada"}],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},agendaRules:DEFAULT_AGENDA_RULES.map(r=>({...r})),selectedWeekStart:defaultWeekKey(),selectedWorkshopByDay:{},dailyWarning:"",weeks:{},lastImportBackup:null};
 }
 function loadDb(){
  try{
@@ -282,6 +357,15 @@ function loadDb(){
    if(!data.weekOptions||typeof data.weekOptions!=="object") data.weekOptions={};
    data.weekOptions.bibliography=!!data.weekOptions.bibliography;
    data.weekOptions.clinicalCase=!!data.weekOptions.clinicalCase;
+   if(!Array.isArray(data.agendaRules)||!data.agendaRules.length)data.agendaRules=DEFAULT_AGENDA_RULES.map(r=>({...r}));
+   if(!data.selectedWorkshopByDay||typeof data.selectedWorkshopByDay!=="object")data.selectedWorkshopByDay={};
+   if(typeof data.dailyWarning!=="string")data.dailyWarning="";
+   if(!data.selectedWeekStart)data.selectedWeekStart=defaultWeekKey();
+   if(!data.weeks||typeof data.weeks!=="object"){
+     data.weeks={};
+     const migrated={};WEEK_FIELDS.forEach(field=>migrated[field]=data[field]);
+     data.weeks[data.selectedWeekStart]=migrated;
+   }
    return data;
  }catch(error){
    console.warn("Données locales illisibles, démarrage avec une base vide.",error);
@@ -289,7 +373,24 @@ function loadDb(){
  }
 }
 let db=loadDb();
-function save(){localStorage.setItem(DB_KEY,JSON.stringify(db));render()}
+function syncCurrentWeek(){
+ const key=db.selectedWeekStart||defaultWeekKey();
+ const snapshot={};WEEK_FIELDS.forEach(field=>snapshot[field]=db[field]);
+ db.weeks[key]=snapshot;
+}
+function loadSelectedWeekIntoDb(){
+ const key=db.selectedWeekStart||defaultWeekKey();
+ const week=db.weeks[key]||blankWeek();
+ WEEK_FIELDS.forEach(field=>db[field]=week[field]!==undefined?week[field]:blankWeek()[field]);
+ db.weeks[key]=week;
+}
+loadSelectedWeekIntoDb();
+function save(){syncCurrentWeek();localStorage.setItem(DB_KEY,JSON.stringify(db));render()}
+let toastTimer=null;
+function showToast(message,tone="info"){
+ toast.textContent=message;toast.style.background=tone==="ok"?"#41633e":tone==="warn"?"#8a641a":"var(--navy)";toast.classList.remove("hidden");
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.add("hidden"),2200);
+}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m}
 function toTime(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
@@ -324,25 +425,44 @@ function defaultDay(){
  return ({1:"Lundi",2:"Mardi",3:"Mercredi",4:"Jeudi",5:"Vendredi"})[d]||"Lundi";
 }
 function setDailyDay(day){db.selectedDay=day;save()}
+function selectDailyActivity(id){db.selectedWorkshopByDay[db.selectedDay||defaultDay()]=id;db.dailyWarning="";save()}
+function moveDailyActivity(direction){
+ const day=db.selectedDay||defaultDay();
+ const list=db.workshops.filter(w=>w.day===day).sort((a,b)=>a.start.localeCompare(b.start));
+ if(!list.length)return;
+ const current=list.findIndex(w=>w.id===db.selectedWorkshopByDay[day]);
+ const next=(Math.max(0,current)+direction+list.length)%list.length;
+ db.selectedWorkshopByDay[day]=list[next].id;db.dailyWarning="";save();
+}
+function clearWorkshopPatients(id){const w=db.workshops.find(x=>x.id===id);if(w&&confirm(`Décocher tous les patients de ${w.title} ?`)){w.patientIds=[];db.dailyWarning="";save()}}
 function renderDaily(){
  const day=db.selectedDay||defaultDay();
  dailyDate.textContent=day;
  dailyDays.innerHTML=DAYS.map(d=>`<button class="tab ${d===day?"active":""}" onclick="setDailyDay('${d}')">${d.slice(0,3)}</button>`).join("");
  const list=[...db.workshops].filter(w=>w.day===day).sort((a,b)=>a.start.localeCompare(b.start));
- dailyActivities.innerHTML=list.length?list.map(w=>`
+ if(!list.length){dailyActivitySelect.innerHTML="<option>Aucune activité</option>";dailyActivitySelect.disabled=true;dailyActivities.innerHTML="<div class='muted'>Aucune activité prévue ce jour.</div>";return}
+ dailyActivitySelect.disabled=false;
+ let selected=list.find(w=>w.id===db.selectedWorkshopByDay[day])||list[0];
+ db.selectedWorkshopByDay[day]=selected.id;
+ dailyActivitySelect.innerHTML=list.map(w=>`<option value="${w.id}" ${w.id===selected.id?"selected":""}>${w.start} — ${esc(w.title)}${w.leader?` — ${esc(w.leader)}`:""}</option>`).join("");
+ const patients=db.patients
+   .filter(p=>!selected.special || (selected.special==="separation"&&isSeparatedAt(p,selected.day,selected.start)) || (selected.special==="tca-non-separation"&&p.tca&&!isSeparatedAt(p,selected.day,selected.start)))
+   .sort((a,b)=>a.code.localeCompare(b.code,"fr",{sensitivity:"base"}));
+ dailyActivities.innerHTML=`
    <div class="daily-card">
      <div class="daily-head">
-       <div><div class="daily-title">${esc(w.title)}</div><div class="daily-meta">${w.start}–${w.end}${w.leader?` · ${esc(w.leader)}`:""}</div></div>
-       <span class="badge">${w.capacity?`${w.patientIds.length}/${w.capacity}`:`${w.patientIds.length} patient(s)`}</span>
+       <div><div class="daily-title">${esc(selected.title)}</div><div class="daily-meta">${selected.start}–${selected.end}${selected.leader?` · ${esc(selected.leader)}`:""}</div></div>
+       <button class="secondary" onclick="clearWorkshopPatients('${selected.id}')">Tout décocher</button>
      </div>
+     ${db.dailyWarning?`<div class="conflict" style="margin-top:10px">${esc(db.dailyWarning)}</div>`:""}
      <div class="patient-grid">
-       ${db.patients.filter(p=>!w.special || (w.special==="separation"&&isSeparatedAt(p,w.day,w.start)) || (w.special==="tca-non-separation"&&p.tca&&!isSeparatedAt(p,w.day,w.start))).map(p=>`<label class="patient-check ${w.patientIds.includes(p.id)?"checked":""}">
-         <input type="checkbox" ${w.patientIds.includes(p.id)?"checked":""}
-           onchange="toggleWorkshopPatient('${w.id}','${p.id}',this.checked)">
+       ${patients.map(p=>`<label class="patient-check ${selected.patientIds.includes(p.id)?"checked":""}">
+         <input type="checkbox" ${selected.patientIds.includes(p.id)?"checked":""}
+           onchange="toggleWorkshopPatient('${selected.id}','${p.id}',this.checked)">
          <span>${esc(p.code)}</span>
        </label>`).join("") || "<span class='muted'>Aucun patient enregistré.</span>"}
      </div>
-   </div>`).join(""):"<div class='muted'>Aucune activité prévue ce jour.</div>";
+   </div>`;
 }
 
 
@@ -361,49 +481,62 @@ function dayNameFromDate(date){
  return ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"][date.getDay()];
 }
 function inferAgendaKind(title){
- const t=normalizeHeader(title);
- const hasPatient=!!inferPatientId(title);
- if(hasPatient&&t.includes("sortie")&&t.includes("sepa")) return "separation-end";
- if(hasPatient&&(t.includes("psychod")||t.includes("psycho")||t.includes("ech")||t.includes("entretien")||t.includes("famil"))) return "patient";
- if(t.includes("atelier")||t.includes("mouvement")||t.includes("groupe")||t.includes("yoga")||t.includes("theatre")||t.includes("2d")) return "activity";
- return "ignore";
+ const rule=matchAgendaRule(title);
+ if(!rule)return "ignore";
+ if(["patient","separation-end"].includes(rule.kind)&&findPatientMatches(title).length===0)return "ignore";
+ return rule.kind;
 }
-function inferPatientId(title){
- const t=normalizeHeader(title);
- const found=db.patients.find(p=>t.includes(normalizeHeader(p.code)));
- return found?.id||"";
+function findPatientMatches(title){
+ const haystack=` ${normalizeHeader(title).replace(/[^a-z0-9]+/g," ")} `;
+ return db.patients.filter(p=>{
+   const needle=normalizeHeader(p.code).replace(/[^a-z0-9]+/g," ").trim();
+   return needle&&haystack.includes(` ${needle} `);
+ });
+}
+function inferPatientId(title){const matches=findPatientMatches(title);return matches.length===1?matches[0].id:""}
+function matchAgendaRule(title){
+ const text=normalizeHeader(title);
+ return db.agendaRules.find(rule=>String(rule.keywords||"").split("|").map(normalizeHeader).filter(Boolean).every(keyword=>text.includes(keyword)));
 }
 function agendaMeaning(title){
- const t=normalizeHeader(title);
- if(t.includes("psychod"))return {label:"Psychodrame",title:"Psychodrame",category:"autre",leader:""};
- if(t.includes("ech"))return {label:"Scolarité – cours individuel",title:"Scolarité – cours individuel",category:"autre",leader:""};
- if(t.includes("mouvement")&&t.includes("soi"))return {label:"Mouvement en soi",title:"Mouvement en soi",category:"corporel",leader:""};
- if(t.includes("atelier")&&t.includes("2d"))return {label:"Atelier 2D",title:"Atelier 2D",category:"art-therapie",leader:"Sibyl"};
+ const rule=matchAgendaRule(title);
+ if(rule)return {label:rule.label||title,title:rule.label||title,category:rule.category||"autre",leader:rule.leader||""};
  return {label:title,title,category:"autre",leader:""};
 }
 
-function startOfCurrentWeek(){
- const now=new Date();
- const day=now.getDay(); // 0 dimanche, 1 lundi...
+function mondayFor(date){
+ const day=date.getDay();
  const diff=(day===0?-6:1-day);
- const start=new Date(now);
+ const start=new Date(date);
  start.setHours(0,0,0,0);
- start.setDate(now.getDate()+diff);
+ start.setDate(date.getDate()+diff);
  return start;
 }
-function endOfCurrentWeek(){
- const end=startOfCurrentWeek();
+function dateInputValue(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
+function startOfSelectedWeek(){
+ if(db.selectedWeekStart){const selected=new Date(`${db.selectedWeekStart}T12:00:00`);if(!isNaN(selected))return mondayFor(selected)}
+ const monday=mondayFor(new Date());db.selectedWeekStart=dateInputValue(monday);return monday;
+}
+function switchSelectedWeek(key){
+ syncCurrentWeek();db.selectedWeekStart=key;loadSelectedWeekIntoDb();ensureBaseWorkshops();save();showToast(`Semaine du ${new Date(`${key}T12:00:00`).toLocaleDateString("fr-FR")} ouverte`,"ok");
+}
+function weekRangeFromKey(key){const start=new Date(`${key}T12:00:00`),end=new Date(start);end.setDate(end.getDate()+6);return `${start.toLocaleDateString("fr-FR")} au ${end.toLocaleDateString("fr-FR")}`}
+function deleteArchivedWeek(key){if(key===db.selectedWeekStart)return;if(confirm(`Supprimer l’archive du ${weekRangeFromKey(key)} ?`)){delete db.weeks[key];save();showToast("Archive supprimée","ok")}}
+function setSelectedWeek(value){if(!value)return;switchSelectedWeek(dateInputValue(mondayFor(new Date(`${value}T12:00:00`))))}
+function moveSelectedWeek(direction){const date=startOfSelectedWeek();date.setDate(date.getDate()+direction*7);switchSelectedWeek(dateInputValue(date))}
+function endOfSelectedWeek(){
+ const end=startOfSelectedWeek();
  end.setDate(end.getDate()+7);
  return end;
 }
-function isInCurrentWeek(date){
- const start=startOfCurrentWeek();
- const end=endOfCurrentWeek();
+function isInSelectedWeek(date){
+ const start=startOfSelectedWeek();
+ const end=endOfSelectedWeek();
  return date>=start && date<end;
 }
 function formatWeekRange(){
- const start=startOfCurrentWeek();
- const end=endOfCurrentWeek();
+ const start=startOfSelectedWeek();
+ const end=endOfSelectedWeek();
  end.setDate(end.getDate()-1);
  return `${start.toLocaleDateString("fr-FR")} au ${end.toLocaleDateString("fr-FR")}`;
 }
@@ -415,7 +548,7 @@ async function importICS(){
    const text=unfoldICS(await file.text());
    const blocks=text.split("BEGIN:VEVENT").slice(1).map(x=>x.split("END:VEVENT")[0]);
    const events=[];
-   let outsideWeek=0;
+   let outsideWeek=0,ignoredOtherPatients=0;
    for(const block of blocks){
      const lines=block.split(/\r?\n/);
      const get=(name)=>{
@@ -426,7 +559,10 @@ async function importICS(){
      const start=parseICSDate(get("DTSTART"));
      const end=parseICSDate(get("DTEND"));
      if(!start||!end) continue;
-     if(!isInCurrentWeek(start)){outsideWeek++;continue}
+     if(!isInSelectedWeek(start)){outsideWeek++;continue}
+     const rule=matchAgendaRule(title);
+     const patientMatches=findPatientMatches(title);
+     if(rule&&["patient","separation-end"].includes(rule.kind)&&patientMatches.length===0){ignoredOtherPatients++;continue}
      const kind=inferAgendaKind(title);
      events.push({
        id:crypto.randomUUID(),title,
@@ -434,13 +570,14 @@ async function importICS(){
        day:dayNameFromDate(start),
        start:toTime(start.getHours()*60+start.getMinutes()),
        end:toTime(end.getHours()*60+end.getMinutes()),
-       kind,patientId:inferPatientId(title),applied:false
+       kind,patientId:patientMatches.length===1?patientMatches[0].id:"",applied:false,
+       anomaly:patientMatches.length>1?`Correspondance ambiguë : ${patientMatches.map(p=>p.code).join(" / ")}`:""
      });
    }
    db.agendaDraft=events;
    save();
-   icsStatus.innerHTML=`<strong>${events.length} événement(s) détecté(s) pour la semaine en cours</strong><br>${formatWeekRange()}<br>${outsideWeek} événement(s) hors semaine ignoré(s).<br>Vérifie l’interprétation ci-dessous.`;
-   return {events:events.length,outsideWeek};
+   icsStatus.innerHTML=`<strong>${events.length} événement(s) détecté(s)</strong><br>${formatWeekRange()}<br>${outsideWeek} hors semaine et ${ignoredOtherPatients} concernant d’autres patients ignoré(s).<br>Vérifie l’interprétation ci-dessous.`;
+   return {events:events.length,outsideWeek,ignoredOtherPatients,anomalies:events.filter(e=>e.anomaly).length};
  }catch(err){
    icsStatus.innerHTML=`<strong>Lecture impossible</strong><br>${esc(err.message||err)}`;
    throw err;
@@ -449,8 +586,11 @@ async function importICS(){
 function clearAgendaDraft(){db.agendaDraft=[];save()}
 function updateAgendaEvent(id,field,value){
  const ev=db.agendaDraft.find(e=>e.id===id);
- if(ev){ev[field]=value;save()}
+ if(ev){ev[field]=value;if(field==="patientId"&&value)ev.anomaly="";save()}
 }
+function addAgendaRule(){db.agendaRules.push({id:crypto.randomUUID(),keywords:"",kind:"activity",label:"Nouvelle règle",category:"autre",leader:""});save()}
+function updateAgendaRule(id,field,value){const rule=db.agendaRules.find(r=>r.id===id);if(rule){rule[field]=value;save()}}
+function removeAgendaRule(id){if(confirm("Supprimer cette règle ?")){db.agendaRules=db.agendaRules.filter(r=>r.id!==id);save()}}
 function applyAgendaEvent(id){
  const ev=db.agendaDraft.find(e=>e.id===id);
  if(!ev||ev.applied||ev.kind==="ignore") return;
@@ -599,6 +739,8 @@ async function importPatientsExcel(){
    if(String(nurseName2||"").trim()&&!nurseId2)warnings.push(`${code} : IDE « ${nurseName2} » non reconnu`);
    if(String(internName1||"").trim()&&!internId)warnings.push(`${code} : interne « ${internName1} » non reconnu`);
    if(String(internName2||"").trim()&&!internId2)warnings.push(`${code} : interne « ${internName2} » non reconnu`);
+   if(!nurseId&&!nurseId2)warnings.push(`${code} : aucun IDE référent reconnu`);
+   if(!internId&&!internId2)warnings.push(`${code} : aucun interne référent reconnu`);
    imported.push({
      ...(previous||{}),id:previous?.id||crypto.randomUUID(),code,nurseId,nurseId2,internId,internId2,
      tca:columns.tca>=0?booleanFromCell(row[columns.tca]):!!previous?.tca,
@@ -614,6 +756,9 @@ async function prepareWeek(){
  const required=[patientExcelFile,excelFile,icsFile,workshopExcelFileDashboard];
  if(required.some(input=>!input.files[0])){alert("Sélectionne les quatre fichiers avant de préparer la semaine.");return}
  if(typeof XLSX==="undefined"){alert("Le module Excel n’a pas chargé. Vérifie la connexion Internet.");return}
+ syncCurrentWeek();
+ db.lastImportBackup={key:db.selectedWeekStart,week:JSON.parse(JSON.stringify(db.weeks[db.selectedWeekStart])),createdAt:new Date().toISOString()};
+ localStorage.setItem(DB_KEY,JSON.stringify(db));
  prepareWeekButton.disabled=true;
  weekPreparationStatus.innerHTML="<strong>Analyse en cours…</strong>";
  try{
@@ -626,15 +771,22 @@ async function prepareWeek(){
    db.agendaDraft=[];
    const agendaResult=await importICS();
    save();
-   const warnings=patientResult.warnings;
+   const warnings=[...patientResult.warnings,...db.agendaDraft.filter(e=>e.anomaly).map(e=>`${e.title} : ${e.anomaly}`)];
    weekPreparationStatus.innerHTML=`
      <strong>Préparation terminée</strong><br>
      ${patientResult.patients} patient(s) · ${ideResult.nurses} IDE · ${(workshopResult?.imported||0)+(workshopResult?.updated||0)} atelier(s) · ${agendaResult?.events||0} événement(s) Agenda<br>
      ${warnings.length?`<span class="warning">${warnings.length} élément(s) à vérifier :</span><br>${warnings.map(esc).join("<br>")}`:"Toutes les références ont été reconnues."}<br>
      <span class="muted">Vérifie maintenant les événements Google Agenda ci-dessous, puis valide-les.</span>`;
+   showToast("Semaine importée et sauvegarde précédente conservée","ok");
  }catch(error){
    weekPreparationStatus.innerHTML=`<strong>Préparation interrompue</strong><br>${esc(error.message||error)}`;
  }finally{prepareWeekButton.disabled=false}
+}
+function undoLastImport(){
+ const backup=db.lastImportBackup;
+ if(!backup){showToast("Aucun import à annuler","warn");return}
+ if(!confirm("Restaurer les données présentes avant le dernier import ?"))return;
+ syncCurrentWeek();db.weeks[backup.key]=JSON.parse(JSON.stringify(backup.week));db.selectedWeekStart=backup.key;db.lastImportBackup=null;loadSelectedWeekIntoDb();save();showToast("Dernier import annulé","ok");
 }
 
 function renameNurse(id,val){const n=db.nurses.find(x=>x.id===id);if(n){n.alias=val.trim()||n.original;save()}}
@@ -694,10 +846,17 @@ function savePatientForm(){
  cancelPatientEdit();
  save();
 }
+function sourceLabel(source,kind){
+ if(source==="google-agenda")return "Google Agenda";
+ if(source==="workshop-excel")return "Calendrier des ateliers";
+ if(source==="automatic")return "Contrainte automatique";
+ if(source==="base")return "Atelier fixe";
+ return kind==="constraint"?"Ajout manuel":"Ajout manuel";
+}
 function patientScheduleItems(p,day){
  const items=[];
- db.workshops.filter(w=>w.day===day&&w.patientIds.includes(p.id)).forEach(w=>items.push({id:w.id,source:"workshop",start:w.start,end:w.end,label:`Atelier : ${w.title}`}));
- db.constraints.filter(c=>c.personId===p.id&&c.day===day).forEach(c=>items.push({id:c.id,source:"constraint",start:c.start,end:c.end,label:c.reason}));
+ db.workshops.filter(w=>w.day===day&&w.patientIds.includes(p.id)).forEach(w=>items.push({id:w.id,source:"workshop",start:w.start,end:w.end,label:`Atelier : ${w.title}`,origin:sourceLabel(w.source||(w.base?"base":"manual"),"workshop")}));
+ db.constraints.filter(c=>c.personId===p.id&&c.day===day).forEach(c=>items.push({id:c.id,source:"constraint",start:c.start,end:c.end,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
  return items.sort((a,b)=>a.start.localeCompare(b.start));
 }
 function editPatientScheduleItem(source,id){
@@ -717,7 +876,7 @@ function renderPatientDetail(){
  const days=DAYS.map(day=>{
    const items=patientScheduleItems(p,day);
    return `<div class="planning-day"><h3>${day}</h3>
-     ${items.length?items.map(x=>`<div class="planning-item"><strong>${x.start}–${x.end}</strong> · ${esc(x.label)} <button class="secondary" style="padding:4px 8px;margin-left:6px" onclick="editPatientScheduleItem('${x.source}','${x.id}')">Modifier</button></div>`).join(""):"<div class='muted'>Aucune activité ou contrainte.</div>"}
+     ${items.length?items.map(x=>`<div class="planning-item"><strong>${x.start}–${x.end}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span> <button class="secondary" style="padding:4px 8px;margin-left:6px" onclick="editPatientScheduleItem('${x.source}','${x.id}')">Modifier</button></div>`).join(""):"<div class='muted'>Aucune activité ou contrainte.</div>"}
    </div>`;
  }).join("");
  patientDetail.innerHTML=`<h2>${esc(p.code)}</h2>
@@ -865,6 +1024,7 @@ function ensureBaseWorkshops(){
    });
  });
  db.baseWorkshopsLoaded=true;
+ syncCurrentWeek();
  localStorage.setItem(DB_KEY,JSON.stringify(db));
 }
 function toggleWeekOption(key,checked){db.weekOptions[key]=checked;save()}
@@ -897,9 +1057,18 @@ function removeWorkshop(id){
 }
 function toggleWorkshopPatient(workshopId,patientId,checked){
  const w=db.workshops.find(x=>x.id===workshopId);if(!w)return;
- if(checked && !w.patientIds.includes(patientId)) w.patientIds.push(patientId);
+ db.dailyWarning="";
+ if(checked && !w.patientIds.includes(patientId)){
+   w.patientIds.push(patientId);
+   const conflicts=db.workshops.filter(other=>other.id!==w.id&&other.day===w.day&&other.patientIds.includes(patientId)&&overlap(w.start,w.end,other.start,other.end));
+   if(conflicts.length){
+     const patient=patientById(patientId);
+     db.dailyWarning=`${patient?.code||"Ce patient"} est déjà inscrit à ${conflicts.map(x=>`${x.title} (${x.start}–${x.end})`).join(", ")}. Inscription conservée — à vérifier.`;
+   }
+ }
  if(!checked) w.patientIds=w.patientIds.filter(id=>id!==patientId);
- save()
+ save();
+ if(!db.dailyWarning)showToast(checked?"Inscription enregistrée":"Inscription retirée","ok");
 }
 function workshopConflictsForPatient(patientId,day,start,end){
  return db.workshops.filter(w =>
@@ -977,12 +1146,13 @@ function findPatientsForSlot(){
  +(impossible.length?`<h3>Non compatibles</h3>${impossible.map(x=>`<div class="conflict"><strong>${esc(x.p.code)}</strong><br><span class="muted">${esc(x.reasons.join(" · "))}</span></div>`).join("")}`:"");
 }
 function exportData(){
+ syncCurrentWeek();
  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ATC-sauvegarde.json";a.click();URL.revokeObjectURL(a.href)
 }
 function importBackup(e){
  const f=e.target.files[0];if(!f)return;
- const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save()}catch{alert("Sauvegarde invalide.")}};r.readAsText(f)
+ const r=new FileReader();r.onload=()=>{try{JSON.parse(r.result);localStorage.setItem(DB_KEY,r.result);location.reload()}catch{alert("Sauvegarde invalide.")}};r.readAsText(f)
 }
 function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem(DB_KEY);location.reload()}}
 function render(){
@@ -1041,6 +1211,7 @@ function render(){
    <div class="agenda-event ${ev.applied?"agenda-applied":""}">
      <strong>${esc(ev.title)}</strong>
      <div class="muted">${esc(ev.day)} ${ev.start}–${ev.end}</div>
+     ${ev.anomaly?`<div class="conflict" style="margin-top:8px">⚠ ${esc(ev.anomaly)}</div>`:""}
      <div class="agenda-grid">
        <div>
          <label>Interprétation</label>
@@ -1063,6 +1234,25 @@ function render(){
      </div>
    </div>`).join(""):"<div class='muted'>Aucun événement à vérifier.</div>";
 
+ agendaRules.innerHTML=db.agendaRules.map(rule=>`<div class="person">
+   <div class="row3">
+     <div><label>Mots recherchés</label><input value="${esc(rule.keywords)}" onchange="updateAgendaRule('${rule.id}','keywords',this.value)"></div>
+     <div><label>Interprétation</label><select onchange="updateAgendaRule('${rule.id}','kind',this.value)">
+       <option value="activity" ${rule.kind==="activity"?"selected":""}>Atelier</option>
+       <option value="patient" ${rule.kind==="patient"?"selected":""}>Rendez-vous patient</option>
+       <option value="separation-end" ${rule.kind==="separation-end"?"selected":""}>Fin de séparation</option>
+     </select></div>
+     <div><label>Nom affiché</label><input value="${esc(rule.label)}" onchange="updateAgendaRule('${rule.id}','label',this.value)"></div>
+     <div><label>Catégorie</label><select onchange="updateAgendaRule('${rule.id}','category',this.value)">
+       <option value="autre" ${rule.category==="autre"?"selected":""}>Autre</option>
+       <option value="art-therapie" ${rule.category==="art-therapie"?"selected":""}>Art-thérapie</option>
+       <option value="corporel" ${rule.category==="corporel"?"selected":""}>Corporel</option>
+     </select></div>
+     <div><label>Intervenant</label><input value="${esc(rule.leader||"")}" onchange="updateAgendaRule('${rule.id}','leader',this.value)"></div>
+   </div>
+   <div class="actions"><button class="danger" onclick="removeAgendaRule('${rule.id}')">Supprimer</button></div>
+ </div>`).join("");
+
  if(typeof weekBibliography!=="undefined"){
    weekBibliography.checked=!!db.weekOptions.bibliography;
    weekClinicalCase.checked=!!db.weekOptions.clinicalCase;
@@ -1082,6 +1272,26 @@ function render(){
      <div class="person"><strong>${db.patients.length} patient(s)</strong></div>`;
    if(db.workshops.length) dashboardWorkshopStatus.innerHTML=`<strong>${db.workshops.length} atelier(s) enregistré(s)</strong>`;
  }
+ const missingNurse=db.patients.filter(p=>!p.nurseId&&!p.nurseId2);
+ const missingIntern=db.patients.filter(p=>!p.internId&&!p.internId2);
+ const ambiguous=db.agendaDraft.filter(e=>e.anomaly&&!e.applied);
+ const checklist=[
+   {ok:db.patients.length>0,label:`Liste des patients : ${db.patients.length}`},
+   {ok:db.nurses.length>0,label:`Planning IDE : ${db.nurses.length} soignant(s)`},
+   {ok:db.workshops.length>0,label:`Ateliers : ${db.workshops.length}`},
+   {ok:db.agendaDraft.length>0,label:`Google Agenda : ${db.agendaDraft.length} événement(s)`},
+   {ok:missingNurse.length===0,label:missingNurse.length?`${missingNurse.length} patient(s) sans IDE référent reconnu`:"Tous les patients ont un IDE référent"},
+   {ok:missingIntern.length===0,label:missingIntern.length?`${missingIntern.length} patient(s) sans interne référent reconnu`:"Tous les patients ont un interne référent"},
+   {ok:ambiguous.length===0,label:ambiguous.length?`${ambiguous.length} événement(s) Agenda ambigu(s)`:"Aucun événement ambigu"}
+ ];
+ dataChecklist.innerHTML=checklist.map(item=>`<div class="person ${item.ok?"ok":"warn"}" style="padding:9px;border-radius:9px;margin:6px 0"><strong>${item.ok?"✓":"!"}</strong> ${esc(item.label)}</div>`).join("");
+ const archiveKeys=Object.keys(db.weeks).filter(key=>key!==db.selectedWeekStart).sort().reverse();
+ archivedWeekCount.textContent=archiveKeys.length;
+ archivedWeeks.innerHTML=archiveKeys.length?archiveKeys.map(key=>`<div class="person"><strong>${weekRangeFromKey(key)}</strong><div class="actions"><button class="secondary" onclick="switchSelectedWeek('${key}')">Ouvrir</button><button class="danger" onclick="deleteArchivedWeek('${key}')">Supprimer</button></div></div>`).join(""):"<span class='muted'>Aucune semaine archivée.</span>";
+ agendaRuleCount.textContent=db.agendaRules.length;
+ undoImportButton.disabled=!db.lastImportBackup;
+ weekStartInput.value=dateInputValue(startOfSelectedWeek());
+ selectedWeekLabel.innerHTML=`<strong>Semaine sélectionnée :</strong> ${formatWeekRange()}`;
 
  if(selectedPatientId)renderPatientDetail();
  renderDaily();

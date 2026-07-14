@@ -25,3 +25,22 @@ Version 7.1 :
 - interprétation Google Agenda : PsychoD, ECH, fin de séparation, Atelier 2D et Mouvement en soi ;
 - remplacement des données importées de la semaine sans supprimer les ajouts manuels ;
 - bilan des références non reconnues avant validation des événements Agenda.
+
+Version 7.2 :
+- choix explicite de la semaine à préparer ;
+- anomalies détaillées, y compris les correspondances patient ambiguës ;
+- événements concernant d’autres patients ignorés silencieusement ;
+- règles Google Agenda modifiables ;
+- Quotidien compact avec menu d’activités, navigation précédente/suivante et tri alphabétique ;
+- bouton Tout décocher et avertissement non bloquant en cas de chevauchement ;
+- origine de chaque activité ou rendez-vous dans le planning patient.
+
+Version 7.3 :
+- navigation inférieure sur iPhone et latérale sur ordinateur ;
+- sélecteur d’activité maintenu en haut du Quotidien ;
+- règles Google repliées par défaut et confirmations visuelles ;
+- données réellement séparées par semaine ;
+- archivage automatique des semaines précédentes ;
+- sauvegarde automatique avant import et annulation du dernier import ;
+- récapitulatif compact des données manquantes.
+- lecteur Google Agenda inchangé dans cette première version.
