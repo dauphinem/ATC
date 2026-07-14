@@ -17,3 +17,11 @@ Version 6.2 :
 - Matthieu et Nada configurés comme internes ;
 - suppression propre de l’onglet Équipe ;
 - conservation des affectations existantes à Matthieu et Nada.
+
+Version 7.1 :
+- préparation hebdomadaire groupée depuis quatre fichiers ;
+- import Excel de la liste des patients et de leurs référents ;
+- rapprochement des IDE après lecture du planning ;
+- interprétation Google Agenda : PsychoD, ECH, fin de séparation, Atelier 2D et Mouvement en soi ;
+- remplacement des données importées de la semaine sans supprimer les ajouts manuels ;
+- bilan des références non reconnues avant validation des événements Agenda.
