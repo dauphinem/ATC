@@ -61,3 +61,37 @@ ATC v9 — Quotidien et navigation simplifiés
 - Pictogrammes vectoriels bordeaux à la place des émojis
 - Patients et Recherche déplacés dans le menu Plus
 - Libellés conservés dans la navigation sur ordinateur
+ATC v9.1 — Direction graphique terre cuite
+
+- Palette reprise de la maquette Canva de Dauphine
+- En-tête terre cuite avec texte blanc
+- Fond cuivré texturé en dégradé
+- Cartes rose poudré et panneaux d’activité blancs
+- « Activité du jour » aligné à gauche
+- Croix compacte à la place de « Tout décocher »
+- Fonction de la croix conservée et libellé accessible ajouté
+- Icône de l’application adaptée à la nouvelle palette
+ATC v9.2 — Page Semaine simplifiée
+
+- Sélecteur de semaine compact sur une seule ligne
+- Données, état des imports et options regroupés dans une seule carte
+- Vérification Google Agenda repliée par défaut
+- Semaines archivées et règles Google Agenda conservées repliées
+- Suppression du bloc Règles de présence IDE
+- Équilibre des activités déplacé dans Quotidien
+ATC v10 — Événements d’équipe et impression
+
+- EF + patient reconnu : bloque Dauphine, ses deux internes et ses deux IDE référents
+- EF : bloque aussi le patient hors séparation, ou en séparation aménagée
+- EF : ne bloque pas le patient en séparation complète
+- Synthèse + patient reconnu : bloque toute l’équipe référente, jamais le patient
+- Les contraintes des IDE sont désormais prises en compte dans la recherche de créneaux
+- Ajout du statut Séparation aménagée dans la fiche patient et l’import Excel
+- Nouveau planning imprimable de Dauphine
+- Planning patient imprimable ou enregistrable en PDF
+- Modèle Excel ATC v10 inclus
+
+ATC v10.1 — Validation automatique de Google Agenda
+- Les événements non ambigus sont ajoutés automatiquement aux plannings
+- Les EF et synthèses apparaissent immédiatement dans le planning de Dauphine
+- Seuls les événements ambigus restent à vérifier manuellement

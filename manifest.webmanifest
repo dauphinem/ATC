@@ -3,8 +3,8 @@
   "short_name": "ATC",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f2f2f4",
-  "theme_color": "#76170f",
+  "background_color": "#b85f43",
+  "theme_color": "#b8664d",
   "icons": [
     {
       "src": "icon-192.svg",
