@@ -95,3 +95,16 @@ ATC v10.1 — Validation automatique de Google Agenda
 - Les événements non ambigus sont ajoutés automatiquement aux plannings
 - Les EF et synthèses apparaissent immédiatement dans le planning de Dauphine
 - Seuls les événements ambigus restent à vérifier manuellement
+
+ATC v10.2 — Calendriers Google récurrents
+- Lecture des événements Google Agenda hebdomadaires pour la semaine sélectionnée
+- Respect de l’intervalle, des jours BYDAY et de la date UNTIL
+- Les événements ponctuels et récurrents non ambigus sont ajoutés automatiquement
+
+ATC v11 — Semaine simplifiée
+- Seul le planning IDE doit être réimporté chaque semaine
+- Patients et calendrier habituel des ateliers conservés lors de la création d’une semaine
+- Inscriptions quotidiennes aux ateliers remises à zéro
+- Prises en charge récurrentes enregistrées dans ATC
+- Ajout rapide des EF, synthèses et autres événements ponctuels
+- Imports Patients, Google Agenda et Ateliers conservés dans Plus comme options facultatives
