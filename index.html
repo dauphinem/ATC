@@ -132,7 +132,7 @@
 <body>
 <header>
   <h1>✈ ATC</h1>
-  <small>Tour de contrôle des entretiens · v10.1</small>
+  <small>Tour de contrôle des entretiens · v11</small>
 </header>
 <main>
   <div class="card main-nav">
@@ -179,8 +179,8 @@
 
 <section id="import" class="panel hidden">
     <div class="card">
-      <h2>Préparer la semaine</h2>
-      <p class="muted">Sélectionne les quatre sources, puis lance une seule préparation.</p>
+      <h2>Nouvelle semaine</h2>
+      <p class="muted">ATC conserve les patients, les ateliers habituels et les prises en charge récurrentes. Seul le planning IDE doit être actualisé chaque semaine.</p>
       <div class="week-picker">
         <label for="weekStartInput">Semaine du lundi</label>
         <button class="secondary" onclick="moveSelectedWeek(-1)" aria-label="Semaine précédente" title="Semaine précédente">‹</button>
@@ -192,17 +192,27 @@
 
     <div class="card">
       <h2>Données de la semaine</h2>
+      <div class="person">
+        <strong>Planning IDE</strong><br><span class="muted">À importer pour la semaine sélectionnée</span>
+        <div class="actions"><input id="excelFile" type="file" accept=".xls,.xlsx"><button id="prepareWeekButton" onclick="prepareSimpleWeek()">Importer le planning IDE</button></div>
+      </div>
+      <div class="person"><strong>Liste des patients</strong> · <span id="patientStatusText">À jour</span><div class="actions"><button class="secondary" onclick="activateTab('patients')">Modifier</button></div></div>
+      <div class="person"><strong>Calendrier des ateliers</strong> · <span id="workshopStatusText">À jour</span><div class="actions"><button class="secondary" onclick="activateTab('workshops')">Modifier</button></div></div>
+      <div class="person"><strong>Prises en charge récurrentes</strong> · <span id="recurringStatusText">À jour</span><div class="actions"><button class="secondary" onclick="activateTab('patients');scrollToRecurring()">Modifier</button></div></div>
+      <div class="actions"><button id="undoImportButton" class="secondary" onclick="undoLastImport()">Annuler le dernier import IDE</button></div>
+      <div id="weekPreparationStatus" class="status muted" style="margin-top:10px">Le planning IDE n’a pas encore été actualisé.</div>
+
+      <h3 class="data-section-title">Ajouter un événement ponctuel</h3>
       <div class="row">
-        <div><label>1. Liste des patients</label><input id="patientExcelFile" type="file" accept=".xls,.xlsx"><small class="muted">Patient, Interne 1, Interne 2, IDE 1, IDE 2, TCA, Séparation, Séparation aménagée<br><a href="Modele_liste_patients_ATC_v10.xlsx" download>Télécharger le modèle Excel</a></small></div>
-        <div><label>2. Planning IDE</label><input id="excelFile" type="file" accept=".xls,.xlsx"></div>
-        <div><label>3. Google Agenda</label><input id="icsFile" type="file" accept=".ics,text/calendar"></div>
-        <div><label>4. Calendrier des ateliers</label><input id="workshopExcelFileDashboard" type="file" accept=".xls,.xlsx"><small class="muted">Jour, Début, Fin, Atelier</small></div>
+        <div><label>Patient</label><select id="eventPatient"></select></div>
+        <div><label>Type</label><select id="eventType"><option value="family-interview">Entretien familial</option><option value="synthesis">Synthèse du patient</option><option value="patient">Prise en charge individuelle</option><option value="outing">Sortie / absence</option><option value="other">Autre</option></select></div>
+        <div><label>Intitulé</label><input id="eventLabel" placeholder="Facultatif"></div>
+        <div><label>Jour</label><select id="eventDay"></select></div>
+        <div><label>Début</label><input id="eventStart" type="time" value="14:00"></div>
+        <div><label>Fin</label><input id="eventEnd" type="time" value="15:00"></div>
       </div>
-      <div class="actions">
-        <button id="prepareWeekButton" onclick="prepareWeek()">Analyser et préparer la semaine</button>
-        <button id="undoImportButton" class="secondary" onclick="undoLastImport()">Annuler le dernier import</button>
-      </div>
-      <div id="weekPreparationStatus" class="status muted" style="margin-top:10px">Aucun nouvel import analysé.</div>
+      <div class="actions"><button onclick="addWeeklyEvent()">+ Ajouter à la semaine</button></div>
+
       <div id="importStatus" class="hidden"></div>
       <div id="dashboardWorkshopStatus" class="hidden"></div>
       <div id="icsStatus" class="hidden"></div>
@@ -218,24 +228,6 @@
       <details class="settings">
         <summary>Semaines archivées — <span id="archivedWeekCount">0</span></summary>
         <div id="archivedWeeks" style="margin-top:10px"></div>
-      </details>
-    </div>
-
-    <div class="card">
-      <details class="settings">
-        <summary>Vérifier les événements Google Agenda</summary>
-        <p class="muted">Corrige seulement les cas ambigus, puis valide.</p>
-        <div class="actions"><button onclick="applyAllAgendaEvents()">Valider tous les événements prêts</button></div>
-        <div id="agendaReview" style="margin-top:10px"></div>
-      </details>
-    </div>
-
-    <div class="card">
-      <details class="settings">
-        <summary>Règles Google Agenda — <span id="agendaRuleCount">7</span> configurées</summary>
-        <p class="muted">Les mots séparés par | doivent tous être présents dans le titre.</p>
-        <div id="agendaRules"></div>
-        <div class="actions"><button class="secondary" onclick="addAgendaRule()">+ Ajouter une règle</button></div>
       </details>
     </div>
 
@@ -262,6 +254,20 @@
     <div class="card" id="patientListCard">
       <h2>Patients</h2>
       <div id="patientList"></div>
+    </div>
+    <div class="card" id="recurringCareCard">
+      <h2>Prises en charge récurrentes</h2>
+      <p class="muted">Elles sont reprises automatiquement chaque semaine.</p>
+      <div class="row">
+        <div><label>Patient</label><select id="recurringPatient"></select></div>
+        <div><label>Type</label><select id="recurringType"><option>Prise en charge individuelle</option><option>Psychodrame</option><option>Scolarité – ECH</option><option>Autre</option></select></div>
+        <div><label>Intitulé personnalisé</label><input id="recurringLabel" placeholder="Facultatif"></div>
+        <div><label>Jour</label><select id="recurringDay"></select></div>
+        <div><label>Début</label><input id="recurringStart" type="time" value="10:00"></div>
+        <div><label>Fin</label><input id="recurringEnd" type="time" value="11:00"></div>
+      </div>
+      <div class="actions"><button onclick="addRecurringCare()">+ Ajouter</button></div>
+      <div id="recurringCareList"></div>
     </div>
     <div id="patientDetailCard" class="card hidden">
       <div class="actions print-hide" style="margin-top:0">
@@ -358,6 +364,32 @@
         <button class="secondary" onclick="activateTab('data')">Données et sauvegardes</button>
       </div>
     </div>
+    <div class="card">
+      <details class="settings">
+        <summary>Imports facultatifs</summary>
+        <p class="muted">À utiliser seulement pour remplacer ou compléter les données déjà enregistrées.</p>
+        <div class="row">
+          <div><label>Liste des patients</label><input id="patientExcelFile" type="file" accept=".xls,.xlsx"><button class="secondary" onclick="importPatientsOnly()">Importer</button></div>
+          <div><label>Google Agenda</label><input id="icsFile" type="file" accept=".ics,text/calendar"><button class="secondary" onclick="importAgendaOnly()">Importer</button></div>
+          <div><label>Calendrier des ateliers</label><input id="workshopExcelFileDashboard" type="file" accept=".xls,.xlsx"><button class="secondary" onclick="importWorkshopsOnly()">Importer</button></div>
+        </div>
+      </details>
+    </div>
+    <div class="card">
+      <details class="settings">
+        <summary>Vérifier les événements Google Agenda</summary>
+        <div class="actions"><button onclick="applyAllAgendaEvents()">Valider tous les événements prêts</button></div>
+        <div id="agendaReview" style="margin-top:10px"></div>
+      </details>
+    </div>
+    <div class="card">
+      <details class="settings">
+        <summary>Règles Google Agenda — <span id="agendaRuleCount">7</span> configurées</summary>
+        <p class="muted">Les mots séparés par | doivent tous être présents dans le titre.</p>
+        <div id="agendaRules"></div>
+        <div class="actions"><button class="secondary" onclick="addAgendaRule()">+ Ajouter une règle</button></div>
+      </details>
+    </div>
   </section>
 </main>
 <div id="toast" class="toast hidden" role="status"></div>
@@ -388,7 +420,7 @@ function defaultWeekKey(){
 }
 function blankWeek(){return {nurses:[],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},selectedDay:defaultDay(),selectedWorkshopByDay:{},dailyWarning:"",baseWorkshopsLoaded:false}}
 function freshDb(){
- return {me:"Dauphine",nurses:[],interns:[{id:"intern-matthieu",name:"Matthieu"},{id:"intern-nada",name:"Nada"}],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},agendaRules:DEFAULT_AGENDA_RULES.map(r=>({...r})),selectedWeekStart:defaultWeekKey(),selectedWorkshopByDay:{},dailyWarning:"",weeks:{},lastImportBackup:null};
+ return {me:"Dauphine",nurses:[],interns:[{id:"intern-matthieu",name:"Matthieu"},{id:"intern-nada",name:"Nada"}],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},agendaRules:DEFAULT_AGENDA_RULES.map(r=>({...r})),recurringCare:[],selectedWeekStart:defaultWeekKey(),selectedWorkshopByDay:{},dailyWarning:"",weeks:{},lastImportBackup:null};
 }
 function loadDb(){
  try{
@@ -398,6 +430,7 @@ function loadDb(){
    for(const key of ["nurses","interns","patients","constraints","workshops","dates","agendaDraft"]){
      if(!Array.isArray(data[key])) data[key]=[];
    }
+   if(!Array.isArray(data.recurringCare))data.recurringCare=[];
    const legacyInterns=data.interns;
    const matthieu=legacyInterns.find(i=>String(i.name||"").trim().toLocaleLowerCase("fr")==="matthieu");
    const nada=legacyInterns.find(i=>String(i.name||"").trim().toLocaleLowerCase("fr")==="nada");
@@ -434,6 +467,7 @@ function loadSelectedWeekIntoDb(){
  const key=db.selectedWeekStart||defaultWeekKey();
  const week=db.weeks[key]||blankWeek();
  WEEK_FIELDS.forEach(field=>db[field]=week[field]!==undefined?week[field]:blankWeek()[field]);
+ db.workshops.forEach(w=>{if(w.base||w.source==="workshop-excel")w.recurring=true});
  db.weeks[key]=week;
 }
 loadSelectedWeekIntoDb();
@@ -527,7 +561,53 @@ function parseICSDate(value){
  if(!m) return null;
  const y=Number(m[1]),mo=Number(m[2])-1,d=Number(m[3]);
  const h=Number(m[4]||0),mi=Number(m[5]||0),s=Number(m[6]||0);
+ if(raw.endsWith("Z"))return new Date(Date.UTC(y,mo,d,h,mi,s));
  return new Date(y,mo,d,h,mi,s);
+}
+function parseRRule(value){
+ const result={};
+ String(value||"").split(";").forEach(part=>{const [key,...rest]=part.split("=");if(key)result[key.toUpperCase()]=rest.join("=")});
+ return result;
+}
+function daysCoveredInSelectedWeek(start,end){
+ const weekStart=startOfSelectedWeek(),weekEnd=endOfSelectedWeek();
+ if(end<=weekStart||start>=weekEnd)return [];
+ const first=new Date(Math.max(start.getTime(),weekStart.getTime()));first.setHours(0,0,0,0);
+ const lastMoment=new Date(Math.min(end.getTime()-1,weekEnd.getTime()-1));lastMoment.setHours(0,0,0,0);
+ const result=[];
+ for(const day=new Date(first);day<=lastMoment;day.setDate(day.getDate()+1)){
+   if(day.getDay()>=1&&day.getDay()<=5){
+     const dayStart=new Date(day);dayStart.setHours(0,0,0,0);
+     const dayEnd=new Date(day);dayEnd.setHours(23,59,0,0);
+     result.push({start:dayStart,end:dayEnd,allDay:true});
+   }
+ }
+ return result;
+}
+function weeklyOccurrencesForSelectedWeek(start,end,rruleValue,allDay=false){
+ if(!rruleValue)return allDay?daysCoveredInSelectedWeek(start,end):(isInSelectedWeek(start)?[{start,end,allDay:false}]:[]);
+ const rule=parseRRule(rruleValue);
+ if(rule.FREQ!=="WEEKLY")return allDay?daysCoveredInSelectedWeek(start,end):(isInSelectedWeek(start)?[{start,end,allDay:false}]:[]);
+ const weekStart=startOfSelectedWeek(),weekEnd=endOfSelectedWeek();
+ const originalWeek=mondayFor(start);
+ const weekDifference=Math.round((weekStart-originalWeek)/(7*24*60*60*1000));
+ const interval=Math.max(1,Number(rule.INTERVAL)||1);
+ if(weekDifference<0||weekDifference%interval!==0)return [];
+ const until=rule.UNTIL?parseICSDate(rule.UNTIL):null;
+ const codes={MO:1,TU:2,WE:3,TH:4,FR:5,SA:6,SU:0};
+ const wantedDays=(rule.BYDAY?rule.BYDAY.split(",").map(x=>codes[x.slice(-2)]):[start.getDay()]).filter(x=>x!==undefined);
+ const duration=Math.max(0,end-start);
+ return wantedDays.map(day=>{
+   const occurrence=new Date(weekStart);
+   occurrence.setDate(occurrence.getDate()+(day===0?6:day-1));
+   occurrence.setHours(start.getHours(),start.getMinutes(),start.getSeconds(),0);
+   if(allDay){
+     const dayStart=new Date(occurrence);dayStart.setHours(0,0,0,0);
+     const dayEnd=new Date(occurrence);dayEnd.setHours(23,59,0,0);
+     return {start:dayStart,end:dayEnd,allDay:true};
+   }
+   return {start:occurrence,end:new Date(occurrence.getTime()+duration),allDay:false};
+ }).filter(occurrence=>occurrence.start>=start&&occurrence.start>=weekStart&&occurrence.start<weekEnd&&(!until||occurrence.start<=until));
 }
 function dayNameFromDate(date){
  return ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"][date.getDay()];
@@ -573,8 +653,17 @@ function startOfSelectedWeek(){
  if(db.selectedWeekStart){const selected=new Date(`${db.selectedWeekStart}T12:00:00`);if(!isNaN(selected))return mondayFor(selected)}
  const monday=mondayFor(new Date());db.selectedWeekStart=dateInputValue(monday);return monday;
 }
+function stableWeekFromCurrent(){
+ const week=blankWeek();
+ week.nurses=db.nurses.map(n=>({...JSON.parse(JSON.stringify(n)),schedule:{}}));
+ week.patients=JSON.parse(JSON.stringify(db.patients));
+ week.workshops=db.workshops.filter(w=>w.base||w.recurring).map(w=>({...JSON.parse(JSON.stringify(w)),patientIds:[]}));
+ return week;
+}
 function switchSelectedWeek(key){
- syncCurrentWeek();db.selectedWeekStart=key;loadSelectedWeekIntoDb();ensureBaseWorkshops();save();showToast(`Semaine du ${new Date(`${key}T12:00:00`).toLocaleDateString("fr-FR")} ouverte`,"ok");
+ syncCurrentWeek();
+ if(!db.weeks[key])db.weeks[key]=stableWeekFromCurrent();
+ db.selectedWeekStart=key;loadSelectedWeekIntoDb();ensureBaseWorkshops();save();showToast(`Semaine du ${new Date(`${key}T12:00:00`).toLocaleDateString("fr-FR")} ouverte`,"ok");
 }
 function weekRangeFromKey(key){const start=new Date(`${key}T12:00:00`),end=new Date(start);end.setDate(end.getDate()+6);return `${start.toLocaleDateString("fr-FR")} au ${end.toLocaleDateString("fr-FR")}`}
 function deleteArchivedWeek(key){if(key===db.selectedWeekStart)return;if(confirm(`Supprimer l’archive du ${weekRangeFromKey(key)} ?`)){delete db.weeks[key];save();showToast("Archive supprimée","ok")}}
@@ -612,23 +701,28 @@ async function importICS(){
        return line?line.slice(line.indexOf(":")+1).replace(/\\n/g," ").replace(/\\,/g,",").trim():"";
      };
      const title=get("SUMMARY")||"Sans titre";
-     const start=parseICSDate(get("DTSTART"));
-     const end=parseICSDate(get("DTEND"));
-     if(!start||!end) continue;
-     if(!isInSelectedWeek(start)){outsideWeek++;continue}
+     const startLine=lines.find(l=>l.startsWith("DTSTART:")||l.startsWith("DTSTART;"))||"";
+     const originalStart=parseICSDate(get("DTSTART"));
+     const originalEnd=parseICSDate(get("DTEND"));
+     if(!originalStart||!originalEnd) continue;
+     const declaredAllDay=/VALUE=DATE/i.test(startLine);
+     const spansSeveralDates=originalStart.toDateString()!==originalEnd.toDateString();
+     const allDay=declaredAllDay||spansSeveralDates||(originalEnd-originalStart)>=23*60*60*1000;
+     const occurrences=weeklyOccurrencesForSelectedWeek(originalStart,originalEnd,get("RRULE"),allDay);
+     if(!occurrences.length){outsideWeek++;continue}
      const rule=matchAgendaRule(title);
      const patientMatches=findPatientMatches(title);
      if(rule&&["patient","separation-end","family-interview","synthesis"].includes(rule.kind)&&patientMatches.length===0){ignoredOtherPatients++;continue}
      const kind=inferAgendaKind(title);
-     events.push({
-       id:crypto.randomUUID(),title,
-       date:start.toISOString(),endDate:end.toISOString(),
-       day:dayNameFromDate(start),
-       start:toTime(start.getHours()*60+start.getMinutes()),
-       end:toTime(end.getHours()*60+end.getMinutes()),
-       kind,patientId:patientMatches.length===1?patientMatches[0].id:"",applied:false,
-       anomaly:patientMatches.length>1?`Correspondance ambiguë : ${patientMatches.map(p=>p.code).join(" / ")}`:""
-     });
+     occurrences.forEach(({start,end,allDay})=>events.push({
+        id:crypto.randomUUID(),title,
+        date:start.toISOString(),endDate:end.toISOString(),
+        day:dayNameFromDate(start),
+        start:allDay?"00:00":toTime(start.getHours()*60+start.getMinutes()),
+        end:allDay?"23:59":toTime(end.getHours()*60+end.getMinutes()),allDay:!!allDay,
+        kind,patientId:patientMatches.length===1?patientMatches[0].id:"",applied:false,
+        anomaly:patientMatches.length>1?`Correspondance ambiguë : ${patientMatches.map(p=>p.code).join(" / ")}`:""
+      }));
    }
    db.agendaDraft=events;
    save();
@@ -650,7 +744,7 @@ function removeAgendaRule(id){if(confirm("Supprimer cette règle ?")){db.agendaR
 function addGoogleConstraint(personId,ev,reason,kind="adult"){
  if(!personId)return;
  const duplicate=db.constraints.some(c=>c.source==="google-agenda"&&c.agendaEventId===ev.id&&c.personId===personId);
- if(!duplicate)db.constraints.push({id:crypto.randomUUID(),agendaEventId:ev.id,personId,day:ev.day,start:ev.start,end:ev.end,reason,kind,source:"google-agenda"});
+ if(!duplicate)db.constraints.push({id:crypto.randomUUID(),agendaEventId:ev.id,personId,day:ev.day,start:ev.start,end:ev.end,allDay:!!ev.allDay,reason,kind,source:ev.source||"google-agenda"});
 }
 function teamIdsForPatient(patient){
  if(!patient)return [];
@@ -678,7 +772,7 @@ function applyAgendaEvent(id){
    const meaning=agendaMeaning(ev.title);
    db.constraints.push({
      id:crypto.randomUUID(),personId:ev.patientId,day:ev.day,
-     start:ev.start,end:ev.end,reason:meaning.label,kind:"patient",source:"google-agenda"
+     start:ev.start,end:ev.end,allDay:!!ev.allDay,reason:meaning.label,kind:"patient",source:"google-agenda"
    });
  }else if(ev.kind==="activity"){
    const meaning=agendaMeaning(ev.title);
@@ -686,7 +780,7 @@ function applyAgendaEvent(id){
    if(!duplicate){
      db.workshops.push({
        id:crypto.randomUUID(),title:meaning.title,day:ev.day,start:ev.start,end:ev.end,
-       leader:meaning.leader,category:meaning.category,capacity:null,patientIds:[],source:"google-agenda"
+       leader:meaning.leader,category:meaning.category,capacity:null,patientIds:[],allDay:!!ev.allDay,source:"google-agenda"
      });
    }
  }
@@ -705,12 +799,12 @@ function applyAllAgendaEvents(silent=false){
      const meaning=agendaMeaning(ev.title);
      db.constraints.push({
        id:crypto.randomUUID(),personId:ev.patientId,day:ev.day,
-       start:ev.start,end:ev.end,reason:meaning.label,kind:"patient",source:"google-agenda"
+       start:ev.start,end:ev.end,allDay:!!ev.allDay,reason:meaning.label,kind:"patient",source:"google-agenda"
      });
    }else if(ev.kind==="activity"){
      const meaning=agendaMeaning(ev.title);
      const duplicate=db.workshops.some(w=>w.day===ev.day&&w.start===ev.start&&w.end===ev.end&&normalizeHeader(w.title)===normalizeHeader(meaning.title));
-     if(!duplicate) db.workshops.push({id:crypto.randomUUID(),title:meaning.title,day:ev.day,start:ev.start,end:ev.end,leader:meaning.leader,category:meaning.category,capacity:null,patientIds:[],source:"google-agenda"});
+     if(!duplicate) db.workshops.push({id:crypto.randomUUID(),title:meaning.title,day:ev.day,start:ev.start,end:ev.end,leader:meaning.leader,category:meaning.category,capacity:null,patientIds:[],allDay:!!ev.allDay,source:"google-agenda"});
    }
    ev.applied=true;
  });
@@ -748,6 +842,7 @@ async function importExcel(){
     const day=DAY_CODES[code];
     if(day && DAYS.includes(day)) dateColumns.push({col:c,day,date:String(rows[dateRow]?.[c]??"")});
   }
+  const previousNurses=[...db.nurses];
   const nurses=[];
   for(let r=dateRow+1;r<rows.length;r++){
     const original=String(rows[r]?.[0]??"").trim();
@@ -759,7 +854,8 @@ async function importExcel(){
       const hours=SHIFT[code];
       if(hours) schedule[dc.day].push({start:hours[0],end:hours[1],code});
     }
-    nurses.push({id:crypto.randomUUID(),original,alias:original,schedule});
+    const previous=previousNurses.find(n=>normalizeHeader(n.original)===normalizeHeader(original)||normalizeHeader(n.alias)===normalizeHeader(original));
+    nurses.push({id:previous?.id||crypto.randomUUID(),original,alias:previous?.alias||original,schedule});
   }
   db.nurses=nurses;
   db.dates=dateColumns;
@@ -864,6 +960,31 @@ async function prepareWeek(){
    weekPreparationStatus.innerHTML=`<strong>Préparation interrompue</strong><br>${esc(error.message||error)}`;
  }finally{prepareWeekButton.disabled=false}
 }
+function backupCurrentWeek(){
+ syncCurrentWeek();
+ db.lastImportBackup={key:db.selectedWeekStart,week:JSON.parse(JSON.stringify(db.weeks[db.selectedWeekStart])),createdAt:new Date().toISOString()};
+ localStorage.setItem(DB_KEY,JSON.stringify(db));
+}
+async function prepareSimpleWeek(){
+ if(!excelFile.files[0]){alert("Choisis le planning IDE de la semaine.");return}
+ backupCurrentWeek();prepareWeekButton.disabled=true;weekPreparationStatus.innerHTML="<strong>Import du planning IDE…</strong>";
+ try{const result=await importExcel();weekPreparationStatus.innerHTML=`<strong>Semaine prête</strong><br>${result.nurses} IDE détectés. Les patients, ateliers et prises en charge récurrentes ont été conservés.`;showToast("Planning IDE actualisé","ok")}
+ catch(error){weekPreparationStatus.innerHTML=`<strong>Import interrompu</strong><br>${esc(error.message||error)}`}
+ finally{prepareWeekButton.disabled=false}
+}
+async function importPatientsOnly(){
+ try{backupCurrentWeek();const result=await importPatientsExcel();save();showToast(`${result.patients} patient(s) importé(s)`,result.warnings.length?"warn":"ok")}
+ catch(error){alert(error.message||error)}
+}
+async function importWorkshopsOnly(){
+ try{backupCurrentWeek();await importWorkshopsFromDashboard();showToast("Calendrier des ateliers actualisé","ok")}
+ catch(error){alert(error.message||error)}
+}
+async function importAgendaOnly(){
+ if(!icsFile.files[0]){alert("Choisis un fichier .ics.");return}
+ try{backupCurrentWeek();db.constraints=db.constraints.filter(c=>c.source!=="google-agenda");db.workshops=db.workshops.filter(w=>w.source!=="google-agenda");db.agendaDraft=[];const result=await importICS();const applied=applyAllAgendaEvents(true);save();showToast(`${applied} événement(s) Agenda ajouté(s)`,result.anomalies?"warn":"ok")}
+ catch(error){alert(error.message||error)}
+}
 function undoLastImport(){
  const backup=db.lastImportBackup;
  if(!backup){showToast("Aucun import à annuler","warn");return}
@@ -942,13 +1063,44 @@ function sourceLabel(source,kind){
  if(source==="workshop-excel")return "Calendrier des ateliers";
  if(source==="automatic")return "Contrainte automatique";
  if(source==="base")return "Atelier fixe";
+ if(source==="recurring")return "Récurrent";
+ if(source==="weekly-manual")return "Événement ponctuel";
  return kind==="constraint"?"Ajout manuel":"Ajout manuel";
 }
+function scheduleTimeLabel(item){return item.allDay?"Journée entière":`${item.start}–${item.end}`}
 function patientScheduleItems(p,day){
  const items=[];
- db.workshops.filter(w=>w.day===day&&w.patientIds.includes(p.id)).forEach(w=>items.push({id:w.id,source:"workshop",start:w.start,end:w.end,label:`Atelier : ${w.title}`,origin:sourceLabel(w.source||(w.base?"base":"manual"),"workshop")}));
- db.constraints.filter(c=>c.personId===p.id&&c.day===day).forEach(c=>items.push({id:c.id,source:"constraint",start:c.start,end:c.end,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
+ db.workshops.filter(w=>w.day===day&&w.patientIds.includes(p.id)).forEach(w=>items.push({id:w.id,source:"workshop",start:w.start,end:w.end,allDay:!!w.allDay,label:`Atelier : ${w.title}`,origin:sourceLabel(w.source||(w.base?"base":"manual"),"workshop")}));
+ db.constraints.filter(c=>c.personId===p.id&&c.day===day).forEach(c=>items.push({id:c.id,source:"constraint",start:c.start,end:c.end,allDay:!!c.allDay,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
+ db.recurringCare.filter(c=>c.patientId===p.id&&c.day===day).forEach(c=>items.push({id:c.id,source:"recurring",start:c.start,end:c.end,label:c.label,origin:"Récurrent"}));
  return items.sort((a,b)=>a.start.localeCompare(b.start));
+}
+function scrollToRecurring(){setTimeout(()=>document.getElementById("recurringCareCard")?.scrollIntoView({behavior:"smooth"}),50)}
+function addRecurringCare(){
+ const patientId=recurringPatient.value,day=recurringDay.value,start=recurringStart.value,end=recurringEnd.value;
+ const label=recurringLabel.value.trim()||recurringType.value;
+ if(!patientId||!day||!start||!end||start>=end){alert("Vérifie le patient, le jour et les horaires.");return}
+ db.recurringCare.push({id:crypto.randomUUID(),patientId,day,start,end,label});recurringLabel.value="";save();showToast("Prise en charge récurrente ajoutée","ok");
+}
+function removeRecurringCare(id){if(confirm("Supprimer cette prise en charge récurrente ?")){db.recurringCare=db.recurringCare.filter(c=>c.id!==id);save()}}
+function editRecurringCare(id){
+ const c=db.recurringCare.find(x=>x.id===id);if(!c)return;
+ const label=prompt("Intitulé",c.label);if(label===null)return;
+ const day=prompt("Jour",c.day);if(day===null)return;
+ const start=prompt("Début",c.start);if(start===null)return;
+ const end=prompt("Fin",c.end);if(end===null)return;
+ if(!DAYS.includes(day.trim())||!start||!end||start>=end){alert("Jour ou horaires invalides.");return}
+ Object.assign(c,{label:label.trim()||c.label,day:day.trim(),start,end});save();
+}
+function addWeeklyEvent(){
+ const patient=patientById(eventPatient.value),kind=eventType.value,day=eventDay.value,start=eventStart.value,end=eventEnd.value;
+ if(!patient||!day||!start||!end||start>=end){alert("Vérifie le patient, le jour et les horaires.");return}
+ const defaults={"family-interview":"Entretien familial",synthesis:"Synthèse",patient:"Prise en charge individuelle",outing:"Sortie / absence",other:"Événement ponctuel"};
+ const label=eventLabel.value.trim()||defaults[kind];
+ if(kind==="family-interview"||kind==="synthesis"){
+   const ev={id:crypto.randomUUID(),patientId:patient.id,day,start,end,title:label,kind,source:"weekly-manual"};applyTeamAgendaEvent(ev);
+ }else db.constraints.push({id:crypto.randomUUID(),personId:patient.id,day,start,end,reason:label,kind:"patient",source:"weekly-manual"});
+ eventLabel.value="";save();showToast(`${label} ajouté`,"ok");
 }
 function myFixedScheduleItems(day){
  const items=[];
@@ -964,14 +1116,14 @@ function myFixedScheduleItems(day){
 }
 function myScheduleItems(day){
  const items=myFixedScheduleItems(day);
- db.constraints.filter(c=>c.personId==="me"&&c.day===day).forEach(c=>items.push({start:c.start,end:c.end,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
+ db.constraints.filter(c=>c.personId==="me"&&c.day===day).forEach(c=>items.push({start:c.start,end:c.end,allDay:!!c.allDay,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
  return items.sort((a,b)=>a.start.localeCompare(b.start));
 }
 function renderMyPlanning(){
  if(typeof myPlanningContent==="undefined")return;
  myPlanningContent.innerHTML=DAYS.map(day=>{
    const items=myScheduleItems(day);
-   return `<div class="planning-day"><h3>${day}</h3>${items.length?items.map(x=>`<div class="planning-item"><strong>${x.start}–${x.end}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span></div>`).join(""):"<div class='muted'>Aucun événement.</div>"}</div>`;
+   return `<div class="planning-day"><h3>${day}</h3>${items.length?items.map(x=>`<div class="planning-item"><strong>${scheduleTimeLabel(x)}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span></div>`).join(""):"<div class='muted'>Aucun événement.</div>"}</div>`;
  }).join("");
 }
 let previousPrintTitle="";
@@ -999,7 +1151,7 @@ function renderPatientDetail(){
  const days=DAYS.map(day=>{
    const items=patientScheduleItems(p,day);
    return `<div class="planning-day"><h3>${day}</h3>
-     ${items.length?items.map(x=>`<div class="planning-item"><strong>${x.start}–${x.end}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span> <button class="secondary" style="padding:4px 8px;margin-left:6px" onclick="editPatientScheduleItem('${x.source}','${x.id}')">Modifier</button></div>`).join(""):"<div class='muted'>Aucune activité ou contrainte.</div>"}
+     ${items.length?items.map(x=>`<div class="planning-item"><strong>${scheduleTimeLabel(x)}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span> <button class="secondary" style="padding:4px 8px;margin-left:6px" onclick="editPatientScheduleItem('${x.source}','${x.id}')">Modifier</button></div>`).join(""):"<div class='muted'>Aucune activité ou contrainte.</div>"}
    </div>`;
  }).join("");
  patientDetail.innerHTML=`<h2>${esc(p.code)}</h2>
@@ -1009,7 +1161,7 @@ function renderPatientDetail(){
    <hr><h2>Planning par patient</h2>${days}`;
 }
 
-function removePatient(id){db.patients=db.patients.filter(x=>x.id!==id);db.constraints=db.constraints.filter(x=>x.personId!==id);save()}
+function removePatient(id){db.patients=db.patients.filter(x=>x.id!==id);db.constraints=db.constraints.filter(x=>x.personId!==id);db.recurringCare=db.recurringCare.filter(x=>x.patientId!==id);save()}
 let constraintFilter="all";
 function addRangeConstraint(personId,day,start,end,reason,kind){
  if(!personId||!day||!start||!end||start>=end){alert("Vérifie les champs.");return}
@@ -1099,11 +1251,11 @@ async function importWorkshopsExcel(){
        w.day===day && normalizeHeader(w.title)===normalizeHeader(title)
      );
      if(existing){
-       Object.assign(existing,{start,end,leader:leader||existing.leader,capacity:capacity??existing.capacity,source:"workshop-excel"});
+       Object.assign(existing,{start,end,leader:leader||existing.leader,capacity:capacity??existing.capacity,source:"workshop-excel",recurring:true});
        updated++;
      }else{
        imported.push({
-         id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[],source:"workshop-excel"
+         id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[],source:"workshop-excel",recurring:true
        });
      }
    }
@@ -1143,7 +1295,7 @@ function ensureBaseWorkshops(){
  BASE_WORKSHOPS.forEach(w=>{
    db.workshops.push({
      id:crypto.randomUUID(),title:w.title,day:w.day,start:w.start,end:w.end,
-     leader:w.leader,capacity:null,patientIds:[],category:w.category,special:w.special,base:true
+     leader:w.leader,capacity:null,patientIds:[],category:w.category,special:w.special,base:true,recurring:true
    });
  });
  db.baseWorkshopsLoaded=true;
@@ -1157,7 +1309,7 @@ function addWorkshop(){
  const leader=wLeader.value.trim(),capacity=Number(wCapacity.value)||null,category=wCategory.value||"";
  if(!title||!day||!start||!end||start>=end){alert("Vérifie le nom, le jour et les horaires.");return}
  db.workshops.push({
-   id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[],category,special:null,base:false
+   id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[],category,special:null,base:false,recurring:false
  });
  wTitle.value="";wLeader.value="";wCapacity.value="";
  save()
@@ -1217,7 +1369,9 @@ function nurseById(id){return db.nurses.find(x=>x.id===id)}
 function internById(id){return db.interns.find(x=>x.id===id)}
 function patientById(id){return db.patients.find(x=>x.id===id)}
 function constraintsFor(personId,day,start,end){
- return db.constraints.filter(c=>c.personId===personId&&c.day===day&&overlap(start,end,c.start,c.end))
+ const weekly=db.constraints.filter(c=>c.personId===personId&&c.day===day&&overlap(start,end,c.start,c.end));
+ const recurring=db.recurringCare.filter(c=>c.patientId===personId&&c.day===day&&overlap(start,end,c.start,c.end)).map(c=>({personId,day,start:c.start,end:c.end,reason:c.label,source:"recurring"}));
+ return [...weekly,...recurring]
 }
 function nursePresent(nurse,day,start,end){
  const shifts=nurse?.schedule?.[day]||[];
@@ -1299,6 +1453,17 @@ function render(){
      <button class="danger" onclick="removePatient('${p.id}')">Supprimer</button>
    </div></div>`
  }).join(""):"Aucun patient.";
+ const patientSelectOptions='<option value="">Choisir un patient</option>'+db.patients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
+ eventPatient.innerHTML=patientSelectOptions;
+ recurringPatient.innerHTML=patientSelectOptions;
+ eventDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
+ recurringDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
+ recurringCareList.innerHTML=db.recurringCare.length?db.recurringCare.slice().sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||a.start.localeCompare(b.start)).map(c=>{
+   const patient=patientById(c.patientId);return `<div class="person"><strong>${esc(patient?.code||"Patient supprimé")}</strong> · ${esc(c.label)} <span class="badge">${esc(c.day)} ${c.start}–${c.end}</span><div class="actions"><button class="secondary" onclick="editRecurringCare('${c.id}')">Modifier</button><button class="danger" onclick="removeRecurringCare('${c.id}')">Supprimer</button></div></div>`
+ }).join(""):"<span class='muted'>Aucune prise en charge récurrente.</span>";
+ patientStatusText.textContent=db.patients.length?`${db.patients.length} patient(s) · À jour`:"À compléter";
+ workshopStatusText.textContent=db.workshops.length?`${db.workshops.length} atelier(s) · À jour`:"À compléter";
+ recurringStatusText.textContent=db.recurringCare.length?`${db.recurringCare.length} créneau(x) · À jour`:"Aucune enregistrée";
  const patients=patientOptions();
  wDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sDay.innerHTML='<option value="">Toute la semaine</option>'+DAYS.map(d=>`<option>${d}</option>`).join("");
@@ -1334,7 +1499,7 @@ function render(){
  agendaReview.innerHTML=db.agendaDraft.length?db.agendaDraft.map(ev=>`
    <div class="agenda-event ${ev.applied?"agenda-applied":""}">
      <strong>${esc(ev.title)}</strong>
-     <div class="muted">${esc(ev.day)} ${ev.start}–${ev.end}</div>
+     <div class="muted">${esc(ev.day)} · ${scheduleTimeLabel(ev)}</div>
      ${ev.anomaly?`<div class="conflict" style="margin-top:8px">⚠ ${esc(ev.anomaly)}</div>`:""}
      <div class="agenda-grid">
        <div>
@@ -1394,10 +1559,10 @@ function render(){
  }
  if(typeof dashboardSummary!=="undefined"){
    dashboardSummary.innerHTML=`
-     <div class="person"><strong>${db.nurses.length?"✓":"○"} Planning IDE</strong> · ${db.nurses.length} soignant(s)</div>
-     <div class="person"><strong>${db.workshops.length?"✓":"○"} Ateliers</strong> · ${db.workshops.length} atelier(s)</div>
-     <div class="person"><strong>${db.agendaDraft.length?"✓":"○"} Google Agenda</strong> · ${db.agendaDraft.length} événement(s) analysé(s)</div>
-     <div class="person"><strong>${db.patients.length} patient(s)</strong></div>`;
+     <div class="person"><strong>${db.importedAt?"✓":"○"} Planning IDE</strong> · ${db.importedAt?`${db.nurses.length} soignant(s) importé(s)`:"À importer cette semaine"}</div>
+     <div class="person"><strong>${db.patients.length?"✓":"○"} Patients</strong> · ${db.patients.length} patient(s)</div>
+     <div class="person"><strong>${db.workshops.length?"✓":"○"} Calendrier des ateliers</strong> · ${db.workshops.length} atelier(s)</div>
+     <div class="person"><strong>${db.recurringCare.length?"✓":"○"} Prises en charge récurrentes</strong> · ${db.recurringCare.length} créneau(x)</div>`;
    if(db.workshops.length) dashboardWorkshopStatus.innerHTML=`<strong>${db.workshops.length} atelier(s) enregistré(s)</strong>`;
  }
  const missingNurse=db.patients.filter(p=>!p.nurseId&&!p.nurseId2);
@@ -1405,9 +1570,8 @@ function render(){
  const ambiguous=db.agendaDraft.filter(e=>e.anomaly&&!e.applied);
  const checklist=[
    {ok:db.patients.length>0,label:`Liste des patients : ${db.patients.length}`},
-   {ok:db.nurses.length>0,label:`Planning IDE : ${db.nurses.length} soignant(s)`},
+   {ok:!!db.importedAt,label:db.importedAt?`Planning IDE : ${db.nurses.length} soignant(s)`:"Planning IDE à importer cette semaine"},
    {ok:db.workshops.length>0,label:`Ateliers : ${db.workshops.length}`},
-   {ok:db.agendaDraft.length>0,label:`Google Agenda : ${db.agendaDraft.length} événement(s)`},
    {ok:missingNurse.length===0,label:missingNurse.length?`${missingNurse.length} patient(s) sans IDE référent reconnu`:"Tous les patients ont un IDE référent"},
    {ok:missingIntern.length===0,label:missingIntern.length?`${missingIntern.length} patient(s) sans interne référent reconnu`:"Tous les patients ont un interne référent"},
    {ok:ambiguous.length===0,label:ambiguous.length?`${ambiguous.length} événement(s) Agenda ambigu(s)`:"Aucun événement ambigu"}
