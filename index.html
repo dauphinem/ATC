@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#b8664d">
   <link rel="manifest" href="manifest.webmanifest">
-  <title>ATC</title>
+  <title>ATC · Disponibilités patients</title>
   <style>
     :root{
       --bg:#b85f43;--paper:rgba(249,237,233,.96);--ink:#8f2f28;--muted:#bc6349;
@@ -19,7 +19,12 @@
     body{margin:0;background-color:#a83a25;background-image:radial-gradient(circle at 18% 10%,rgba(255,242,218,.86) 0 13%,transparent 34%),radial-gradient(circle at 82% 58%,rgba(238,151,98,.72) 0 18%,transparent 48%),radial-gradient(circle at 16% 88%,rgba(118,20,13,.88) 0 19%,transparent 52%),linear-gradient(145deg,#f1c6a4 0%,#c66c48 58%,#8f2017 100%);background-attachment:fixed;color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}
     body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.09;background-image:repeating-radial-gradient(circle at 0 0,rgba(74,19,12,.7) 0 1px,transparent 1px 4px);mix-blend-mode:multiply}
     header{position:sticky;top:0;z-index:5;padding:22px 26px;background:rgba(184,102,77,.97);-webkit-backdrop-filter:saturate(150%) blur(18px);backdrop-filter:saturate(150%) blur(18px);border-bottom:1px solid rgba(255,255,255,.28)}
-    header h1{margin:0;font-size:27px;letter-spacing:.04em;color:white}
+    .header-content{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    header h1{margin:0;font-size:27px;letter-spacing:.01em;color:white;display:flex;align-items:center;gap:11px}
+    .settings-button{width:42px;height:42px;padding:0;border-radius:50%;border-color:rgba(255,255,255,.72);background:rgba(255,255,255,.18);box-shadow:none;display:grid;place-items:center}
+    .settings-button svg{width:23px;height:23px;fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .brand-mark{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 4px 16px rgba(83,21,15,.18)}
+    .brand-mark svg{width:27px;height:27px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     header small{color:white;font-size:16px}
     main{max-width:920px;margin:auto;padding:14px}
     .card{background:var(--paper);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.9);border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 2px 4px rgba(83,21,15,.07),0 12px 34px rgba(83,21,15,.12)}
@@ -93,6 +98,59 @@
     .week-picker input{height:42px}
     .data-section-title{margin-top:18px;padding-top:15px;border-top:1px solid rgba(255,255,255,.82);color:var(--rose)}
     .toast{position:fixed;right:20px;bottom:20px;z-index:30;max-width:340px;padding:12px 16px;border-radius:14px;background:var(--navy);color:white;box-shadow:0 12px 34px rgba(87,11,7,.24)}
+    .search-hero{padding:18px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(249,237,233,.94))}
+    .search-hero h2{font-size:25px;margin-bottom:4px}
+    .search-box{position:relative;margin-top:16px}
+    .search-box input{height:54px;padding:13px 46px 13px 44px;border-radius:17px;font-size:18px;font-weight:650;background:white}
+    .search-box svg{position:absolute;left:15px;top:16px;width:22px;height:22px;stroke:var(--rose);fill:none;stroke-width:2}
+    .search-clear{position:absolute;right:8px;top:8px;width:38px;height:38px;padding:0;border:0;background:var(--soft-strong);color:var(--rose);box-shadow:none;border-radius:50%}
+    .patient-suggestions{display:grid;gap:8px;margin-top:12px}
+    .patient-suggestion{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:50px;padding:11px 14px;text-align:left;background:white;color:var(--ink);border-color:var(--line);box-shadow:none}
+    .patient-suggestion span:last-child{color:var(--muted);font-size:13px}
+    .availability-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 10px}
+    .slot{min-height:52px;padding:13px 14px}
+    .slot .badge{font-size:14px;padding:6px 10px;margin-top:7px}
+    .quick-help{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted)}
+    .unit-switch-wrap{position:sticky;top:94px;z-index:9;max-width:920px;margin:0 auto;padding:8px 14px 0}
+    .unit-switch{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:3px;border-radius:13px;background:rgba(103,17,12,.14);box-shadow:0 5px 18px rgba(83,21,15,.1);backdrop-filter:blur(16px)}
+    .unit-button{min-height:38px;padding:7px 14px;border:0;border-radius:10px;background:transparent;color:var(--navy);box-shadow:none}
+    .unit-button.active{background:white;color:var(--navy);box-shadow:0 2px 9px rgba(83,21,15,.15)}
+    .unit-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:currentColor}
+    .swipe-hint{text-align:center;font-size:11px;color:var(--muted);margin:-3px 0 7px}
+    .planning-controls{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin:12px 0}
+    .planning-summary{padding:12px 14px;border-radius:14px;background:var(--soft-strong);margin:10px 0}
+    .balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .balance-card{padding:14px;border-radius:16px;background:white;border:1px solid var(--line)}
+    .balance-score{font-size:25px;font-weight:850;color:var(--navy);line-height:1.1}
+    .balance-bar{height:7px;background:var(--soft-strong);border-radius:99px;overflow:hidden;margin:9px 0}
+    .balance-bar span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--rose),var(--navy))}
+    .balance-missing{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+    .calendar-scroll{overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+    .calendar-week{display:grid;grid-template-columns:repeat(5,minmax(165px,1fr));gap:8px;min-width:850px}
+    .calendar-day{scroll-snap-align:start;padding:10px;border-radius:14px;background:var(--soft-strong);border:1px solid var(--line);min-height:280px}
+    .calendar-day h3{position:sticky;top:0;margin:0 0 8px;padding:3px 0 7px;background:var(--soft-strong);z-index:1}
+    .calendar-event{padding:9px;border-radius:10px;background:white;border-left:4px solid var(--rose);margin:6px 0;font-size:13px;box-shadow:0 2px 7px rgba(83,21,15,.06)}
+    .calendar-event.recurring{border-left-color:var(--navy)}
+    .calendar-empty{font-size:13px;color:var(--muted);padding:12px 2px}
+    .day-navigation{display:grid;grid-template-columns:40px 1fr 40px;gap:7px;align-items:center;margin:10px 0}
+    .day-navigation button{width:40px;height:40px;padding:0}
+    /* Direction iOS 26 : chrome translucide, contenu calme et contrôles concentriques */
+    :root{--glass:rgba(255,248,246,.72);--glass-strong:rgba(255,252,250,.9);--glass-line:rgba(255,255,255,.76);--shadow:0 14px 44px rgba(91,25,17,.13)}
+    header{background:linear-gradient(180deg,rgba(177,77,53,.88),rgba(177,77,53,.72));border-bottom:1px solid rgba(255,255,255,.32);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%)}
+    .brand-mark{background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.8);box-shadow:0 7px 22px rgba(83,21,15,.16)}
+    .brand-mark svg{color:var(--navy);stroke:var(--navy);stroke-width:2.2}
+    .settings-button{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.45);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%)}
+    .card{background:var(--glass-strong);border:1px solid var(--glass-line);border-radius:26px;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%)}
+    input,select{border-color:rgba(151,67,51,.16);border-radius:15px;background:rgba(255,255,255,.82);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 8px rgba(83,21,15,.04)}
+    button{border-radius:15px;box-shadow:0 6px 18px rgba(103,17,12,.16)}
+    button.secondary{background:rgba(255,255,255,.58);border-color:rgba(141,31,23,.25);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+    .unit-switch{padding:4px;border:1px solid rgba(255,255,255,.65);background:rgba(255,244,241,.58);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%)}
+    .unit-button{border-radius:11px}.unit-button.active{background:rgba(255,255,255,.92);box-shadow:0 5px 16px rgba(83,21,15,.12)}
+    .daily-card,.agenda-event,.balance-card,.calendar-day{border-color:rgba(151,67,51,.14);box-shadow:0 7px 24px rgba(83,21,15,.07)}
+    .patient-check{border-color:rgba(151,67,51,.14);background:rgba(255,255,255,.66)}
+    .patient-check.checked{background:rgba(222,239,220,.9);box-shadow:inset 0 0 0 1px rgba(90,132,79,.18)}
+    .badge{background:rgba(238,219,214,.7);border:1px solid rgba(255,255,255,.65)}
+    @media(prefers-reduced-transparency:reduce){header,.card,.main-nav,.unit-switch,.settings-button{backdrop-filter:none;-webkit-backdrop-filter:none;background:#fff8f6}}
     details.settings>summary{cursor:pointer;font-weight:800;color:var(--navy)}
     .print-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
     @media print{
@@ -108,16 +166,19 @@
     }
     @media(min-width:901px){body{padding-left:198px}header{margin-left:-198px;padding-left:224px}}
     @media(max-width:900px){
-      body{padding-bottom:84px}
+      body{padding-bottom:108px}
       main{padding:10px}
       header{padding:20px 26px}
       header h1{font-size:26px}
       header small{font-size:16px}
       .main-nav{left:0;right:0;top:auto;bottom:0;width:auto;border-radius:18px 18px 0 0;padding:7px calc(7px + env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) calc(7px + env(safe-area-inset-left));background:rgba(255,255,255,.96)}
-      .main-nav .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-      .main-nav .tab{justify-content:center;text-align:center;padding:9px 3px;border:0;min-height:48px}
-      .main-nav .nav-label{display:none}
-      .main-nav .nav-icon{width:26px;height:26px}
+      .main-nav{left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));border-radius:25px;padding:6px;background:rgba(255,248,246,.72);border:1px solid rgba(255,255,255,.78);box-shadow:0 12px 38px rgba(83,21,15,.2);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%)}
+      .main-nav .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+      .main-nav .tab{justify-content:center;text-align:center;padding:8px 3px;border:0;min-height:52px;border-radius:19px;box-shadow:none}
+      .main-nav .tab.active{background:rgba(141,31,23,.92);box-shadow:0 6px 18px rgba(103,17,12,.2)}
+      .main-nav .tab{flex-direction:column;gap:2px;font-size:10px;font-weight:750}
+      .main-nav .nav-label{display:block}
+      .main-nav .nav-icon{width:24px;height:24px}
       .daily-sticky{top:96px}
       .daily-toolbar{grid-template-columns:42px 42px minmax(0,1fr) 42px;gap:6px}
       .daily-toolbar button{width:42px;height:42px}
@@ -126,36 +187,66 @@
       .week-picker>label{font-size:14px}
       .week-picker button{width:38px;height:42px}
       .toast{left:12px;right:12px;bottom:92px;max-width:none}
+      .unit-switch-wrap{top:93px;padding:7px 10px 0}
+      #daily>.card:first-child{padding:10px 12px;margin-bottom:8px}
+      #daily>.card:first-child h2{font-size:16px;margin-bottom:2px}
+      #daily>.card:nth-child(2){padding:9px 10px}
+      #daily .daily-sticky{position:static;padding:0 0 6px}
+      #daily .daily-card{margin:5px 0}
+      #daily .daily-head{padding:9px 10px}
+      #daily .daily-title{font-size:16px}
+      #daily .daily-meta{font-size:12px}
+      #daily .patient-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:7px}
+      #daily .patient-check{min-height:43px;padding:6px 5px;gap:5px;border-radius:10px;font-size:13px;justify-content:flex-start}
+      #daily .patient-check input{width:18px;height:18px;flex:0 0 auto}
+      #daily .daily-toolbar label{font-size:13px}
+      #daily .daily-toolbar select,#daily .daily-toolbar button{height:38px}
+      #daily .daily-toolbar button{width:38px}
+      .planning-controls{grid-template-columns:1fr}
+      .balance-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
 <header>
-  <h1>✈ ATC</h1>
-  <small>Tour de contrôle des entretiens · v11</small>
+  <div class="header-content">
+    <div><h1><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><path d="M16 16 23 9M16 6v3M16 23v3M6 16h3M23 16h3"/><circle cx="16" cy="16" r="2.2" fill="currentColor" stroke="none"/></svg></span> ATC</h1><small>Tour de contrôle des entretiens</small></div>
+    <button class="settings-button" onclick="activateTab('more')" aria-label="Réglages et données" title="Réglages et données"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.55v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-1.51-1H2.5V10h.09A1.7 1.7 0 0 0 4.1 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.56 4.2l.06.06A1.7 1.7 0 0 0 8.5 4.6a1.7 1.7 0 0 0 1-1.51V3h4v.09a1.7 1.7 0 0 0 1 1.51 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 18.9 9a1.7 1.7 0 0 0 1.51 1h.09v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg></button>
+  </div>
 </header>
+<div class="unit-switch-wrap" aria-label="Côté affiché">
+  <div class="unit-switch">
+    <button id="unitCoursButton" class="unit-button active" onclick="setActiveUnit('cours')"><span class="unit-dot"></span>Cours</button>
+    <button id="unitJardinButton" class="unit-button" onclick="setActiveUnit('jardin')"><span class="unit-dot"></span>Jardin</button>
+  </div>
+</div>
 <main>
   <div class="card main-nav">
     <div class="tabs">
-      <button class="tab active" data-tab="daily" aria-label="Quotidien" title="Quotidien">
-        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg>
-        <span class="nav-label">Quotidien</span>
+      <button class="tab active" data-tab="search" aria-label="Recherche" title="Recherche">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        <span class="nav-label">Recherche</span>
+      </button>
+      <button class="tab" data-tab="daily" aria-label="Activités" title="Activités">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.3a1.7 1.7 0 0 0 .7-3.25 1.7 1.7 0 0 1 .7-3.25H17a4 4 0 0 0 4-4C21 6.35 17 3 12 3Z"></path><circle cx="7.5" cy="10" r="1" fill="currentColor" stroke="none"></circle><circle cx="10" cy="6.8" r="1" fill="currentColor" stroke="none"></circle><circle cx="14" cy="6.8" r="1" fill="currentColor" stroke="none"></circle><circle cx="17" cy="10" r="1" fill="currentColor" stroke="none"></circle></svg>
+        <span class="nav-label">Activités</span>
       </button>
       <button class="tab" data-tab="import" aria-label="Semaine" title="Semaine">
         <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
         <span class="nav-label">Semaine</span>
       </button>
-      <button class="tab" data-tab="more" aria-label="Plus" title="Plus">
-        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.25" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.25" fill="currentColor" stroke="none"></circle><circle cx="19" cy="12" r="1.25" fill="currentColor" stroke="none"></circle></svg>
-        <span class="nav-label">Plus</span>
+      <button class="tab" data-tab="myplanning" aria-label="Planning" title="Planning">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"></rect><path d="M8 2v4M16 2v4M3 9h18M8 13h3M13 13h3M8 17h3"></path></svg>
+        <span class="nav-label">Planning</span>
       </button>
     </div>
   </div>
 
   
-  <section id="daily" class="panel">
+  <section id="daily" class="panel hidden">
+    <div class="swipe-hint">‹ Recherche à gauche · Semaine à droite ›</div>
     <div class="card">
-      <h2>Quotidien</h2>
+      <h2>Remplir une activité</h2>
       <div id="dailyDate" class="muted"></div>
       <div id="dailyDays" class="tabs" style="margin-top:10px"></div>
     </div>
@@ -238,6 +329,7 @@
       <h2 id="patientFormTitle">Ajouter un patient</h2>
       <div class="row">
         <div><label>Indicatif patient</label><input id="pCode" placeholder="Charlie12"></div>
+        <div><label>Côté</label><select id="pUnit"><option value="cours">Cours</option><option value="jardin">Jardin</option></select></div>
         <div><label>IDE référent 1</label><select id="pNurse"></select></div>
         <div><label>IDE référent 2</label><select id="pNurse2"></select></div>
         <div><label>Interne référent 1</label><select id="pIntern"></select></div>
@@ -282,10 +374,11 @@
     <input id="workshopExcelFile" type="file" accept=".xls,.xlsx" class="hidden">
     <div id="workshopImportStatus" class="hidden"></div>
     <div class="card">
-      <h2>Créer un atelier ponctuel</h2>
-      <p class="muted">Ajoute l’atelier une seule fois, puis coche les patients inscrits. Leur indisponibilité sera créée automatiquement.</p>
+      <h2>Créer un atelier</h2>
+      <p class="muted">Choisissez s’il a lieu uniquement cette semaine ou s’il doit être repris les semaines suivantes.</p>
       <div class="row">
         <div><label>Nom de l’atelier</label><input id="wTitle" placeholder="Théâtre d’objets"></div>
+        <div><label>Fréquence</label><select id="wRecurrence"><option value="once">Ponctuel · cette semaine</option><option value="recurring">Récurrent · chaque semaine</option></select></div>
         <div><label>Jour</label><select id="wDay"></select></div>
         <div><label>Début</label><input id="wStart" type="time" step="900" value="14:00"></div>
         <div><label>Fin</label><input id="wEnd" type="time" step="900" value="15:00"></div>
@@ -309,15 +402,24 @@
     </div>
   </section>
 
-  <section id="search" class="panel hidden">
-    <div class="card">
-      <h2>Je dois voir un patient</h2>
-      <div class="row">
-        <div><label>Patient</label><select id="sPatient"></select></div>
-        <div><label>Jour</label><select id="sDay"><option value="">Toute la semaine</option></select></div>
+  <section id="search" class="panel">
+    <div class="card search-hero">
+      <h2>Quand puis-je voir…</h2>
+      <div class="muted">Recherchez un indicatif patient pour afficher ses disponibilités.</div>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        <input id="patientSearchInput" type="search" placeholder="Indicatif patient" autocomplete="off" oninput="searchPatientAvailability(this.value)" aria-label="Rechercher un patient">
+        <button id="patientSearchClear" class="search-clear hidden" onclick="clearPatientSearch()" aria-label="Effacer la recherche">×</button>
       </div>
-      <div class="actions"><button onclick="findForPatient()">Trouver les créneaux</button></div>
-      <div id="patientResults" style="margin-top:10px" class="muted">Aucune recherche lancée.</div>
+      <select id="sPatient" class="hidden" aria-hidden="true"></select>
+      <div id="patientSuggestions" class="patient-suggestions"></div>
+      <div class="quick-help">⌕ Les résultats se mettent à jour pendant la saisie.</div>
+    </div>
+    <div id="availabilityCard" class="card hidden">
+      <div class="availability-title"><div><h2 id="availabilityPatientTitle">Disponibilités</h2><span class="muted">Créneaux de 30 minutes</span></div></div>
+      <label for="sDay">Afficher</label>
+      <select id="sDay" onchange="findForPatient()"><option value="">Toute la semaine</option></select>
+      <div id="patientResults" style="margin-top:12px" class="muted"></div>
     </div>
 
     <div class="card">
@@ -346,20 +448,27 @@
   <section id="myplanning" class="panel hidden">
     <div id="myPlanningCard" class="card">
       <div class="print-heading">
-        <div><h2>Planning de Dauphine</h2><div class="muted">Semaine sélectionnée</div></div>
-        <button class="secondary print-hide" onclick="printPlanning('myPlanningCard','Planning de Dauphine')">Imprimer / PDF</button>
+        <div><h2>Plannings</h2><div class="muted">Patient, interne, IDE ou Senior</div></div>
+        <button class="secondary print-hide" onclick="printPlanning('myPlanningCard',planningTitle.textContent)">Imprimer / PDF</button>
       </div>
+      <div class="planning-controls print-hide">
+        <div><label>Afficher</label><select id="planningScope" onchange="updatePlanningScope()"><option value="people">Planning d’une personne</option><option value="workshops">Planning des ateliers</option></select></div>
+        <div><label>Vue</label><select id="planningView" onchange="renderPlanningHub()"><option value="week">Semaine</option><option value="day">Journée</option></select></div>
+        <div id="planningTypeWrap"><label>Profil</label><select id="planningType" onchange="updatePlanningPeople()"><option value="me">Mon planning</option><option value="patient">Patient</option><option value="intern">Interne</option><option value="nurse">Infirmier</option></select></div>
+        <div id="planningPersonWrap" class="hidden"><label>Personne</label><select id="planningPerson" onchange="renderPlanningHub()"></select></div>
+      </div>
+      <div id="planningDayWrap" class="day-navigation print-hide hidden"><button class="secondary" onclick="movePlanningDay(-1)" aria-label="Jour précédent">‹</button><select id="planningDay" onchange="renderPlanningHub()"></select><button class="secondary" onclick="movePlanningDay(1)" aria-label="Jour suivant">›</button></div>
+      <div id="planningTitle" class="planning-summary"><strong>Planning de Dauphine</strong></div>
       <div id="myPlanningContent"></div>
     </div>
   </section>
 
   <section id="more" class="panel hidden">
     <div class="card">
-      <h2>Plus</h2>
+      <h2>Réglages et données</h2>
       <div class="actions">
         <button onclick="activateTab('patients')">Patients</button>
         <button class="secondary" onclick="activateTab('search')">Recherche</button>
-        <button class="secondary" onclick="activateTab('myplanning')">Mon planning</button>
         <button onclick="activateTab('workshops')">Ateliers</button>
         <button class="secondary" onclick="activateTab('data')">Données et sauvegardes</button>
       </div>
@@ -420,13 +529,14 @@ function defaultWeekKey(){
 }
 function blankWeek(){return {nurses:[],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},selectedDay:defaultDay(),selectedWorkshopByDay:{},dailyWarning:"",baseWorkshopsLoaded:false}}
 function freshDb(){
- return {me:"Dauphine",nurses:[],interns:[{id:"intern-matthieu",name:"Matthieu"},{id:"intern-nada",name:"Nada"}],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},agendaRules:DEFAULT_AGENDA_RULES.map(r=>({...r})),recurringCare:[],selectedWeekStart:defaultWeekKey(),selectedWorkshopByDay:{},dailyWarning:"",weeks:{},lastImportBackup:null};
+ return {me:"Dauphine",activeUnit:"cours",nurses:[],interns:[{id:"intern-matthieu",name:"Matthieu"},{id:"intern-nada",name:"Nada"}],patients:[],constraints:[],workshops:[],dates:[],importedAt:null,agendaDraft:[],weekOptions:{bibliography:false,clinicalCase:false},agendaRules:DEFAULT_AGENDA_RULES.map(r=>({...r})),recurringCare:[],selectedWeekStart:defaultWeekKey(),selectedWorkshopByDay:{},dailyWarning:"",weeks:{},lastImportBackup:null};
 }
 function loadDb(){
  try{
    const stored=JSON.parse(localStorage.getItem(DB_KEY)||"null");
    const data=stored&&typeof stored==="object"?stored:freshDb();
    data.me="Dauphine";
+   if(!["cours","jardin"].includes(data.activeUnit))data.activeUnit="cours";
    for(const key of ["nurses","interns","patients","constraints","workshops","dates","agendaDraft"]){
      if(!Array.isArray(data[key])) data[key]=[];
    }
@@ -472,6 +582,16 @@ function loadSelectedWeekIntoDb(){
 }
 loadSelectedWeekIntoDb();
 function save(){syncCurrentWeek();localStorage.setItem(DB_KEY,JSON.stringify(db));render()}
+function visiblePatients(){return db.patients.filter(p=>!p.unit||p.unit===db.activeUnit)}
+function setActiveUnit(unit){
+ if(!["cours","jardin"].includes(unit)||db.activeUnit===unit)return;
+ db.activeUnit=unit;
+ if(typeof patientSearchInput!=="undefined"){
+   patientSearchInput.value="";sPatient.value="";patientSuggestions.innerHTML="";
+   availabilityCard.classList.add("hidden");patientSearchClear.classList.add("hidden");
+ }
+ save();showToast(`Côté ${unit==="cours"?"Cours":"Jardin"}`);
+}
 let toastTimer=null;
 function showToast(message,tone="info"){
  toast.textContent=message;toast.style.background=tone==="ok"?"#41633e":tone==="warn"?"#8a641a":"var(--navy)";toast.classList.remove("hidden");
@@ -504,6 +624,22 @@ function tabSetup(){
  document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>activateTab(btn.dataset.tab));
 }
 tabSetup();
+const SWIPE_PANELS=["search","daily","import","myplanning"];
+let swipeStartX=0,swipeStartY=0;
+document.addEventListener("touchstart",event=>{
+ if(event.touches.length!==1||event.target.closest("input,select,button,label,details,.calendar-scroll"))return;
+ swipeStartX=event.touches[0].clientX;swipeStartY=event.touches[0].clientY;
+},{passive:true});
+document.addEventListener("touchend",event=>{
+ if(!swipeStartX||!event.changedTouches.length)return;
+ const dx=event.changedTouches[0].clientX-swipeStartX,dy=event.changedTouches[0].clientY-swipeStartY;
+ swipeStartX=0;swipeStartY=0;
+ if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.35)return;
+ const current=document.querySelector(".panel:not(.hidden)")?.id,index=SWIPE_PANELS.indexOf(current);
+ if(index<0)return;
+ const next=dx>0?index-1:index+1;
+ if(next>=0&&next<SWIPE_PANELS.length)activateTab(SWIPE_PANELS[next]);
+},{passive:true});
 
 
 function defaultDay(){
@@ -520,7 +656,13 @@ function moveDailyActivity(direction){
  const next=(Math.max(0,current)+direction+list.length)%list.length;
  db.selectedWorkshopByDay[day]=list[next].id;db.dailyWarning="";save();
 }
-function clearWorkshopPatients(id){const w=db.workshops.find(x=>x.id===id);if(w&&confirm(`Décocher tous les patients de ${w.title} ?`)){w.patientIds=[];db.dailyWarning="";save()}}
+function clearWorkshopPatients(id){
+ const w=db.workshops.find(x=>x.id===id);if(!w)return;
+ const visibleIds=new Set(visiblePatients().map(p=>p.id));
+ if(confirm(`Décocher les patients côté ${db.activeUnit==="cours"?"Cours":"Jardin"} de ${w.title} ?`)){
+   w.patientIds=w.patientIds.filter(id=>!visibleIds.has(id));db.dailyWarning="";save();
+ }
+}
 function renderDaily(){
  const day=db.selectedDay||defaultDay();
  dailyDate.textContent=day;
@@ -531,14 +673,14 @@ function renderDaily(){
  let selected=list.find(w=>w.id===db.selectedWorkshopByDay[day])||list[0];
  db.selectedWorkshopByDay[day]=selected.id;
  dailyActivitySelect.innerHTML=list.map(w=>`<option value="${w.id}" ${w.id===selected.id?"selected":""}>${w.start} — ${esc(w.title)}${w.leader?` — ${esc(w.leader)}`:""}</option>`).join("");
- const patients=db.patients
+ const patients=visiblePatients()
    .filter(p=>!selected.special || (selected.special==="separation"&&isSeparatedAt(p,selected.day,selected.start)) || (selected.special==="tca-non-separation"&&p.tca&&!isSeparatedAt(p,selected.day,selected.start)))
    .sort((a,b)=>a.code.localeCompare(b.code,"fr",{sensitivity:"base"}));
  dailyActivities.innerHTML=`
    <div class="daily-card">
      <div class="daily-head">
        <div><div class="daily-title">${esc(selected.title)}</div><div class="daily-meta">${selected.start}–${selected.end}${selected.leader?` · ${esc(selected.leader)}`:""}</div></div>
-       <button class="secondary clear-workshop" onclick="clearWorkshopPatients('${selected.id}')" aria-label="Tout décocher" title="Tout décocher">×</button>
+       <div style="display:flex;align-items:center;gap:8px"><span class="badge">${patients.filter(p=>selected.patientIds.includes(p.id)).length}/${patients.length}</span><button class="secondary clear-workshop" onclick="clearWorkshopPatients('${selected.id}')" aria-label="Tout décocher" title="Tout décocher">×</button></div>
      </div>
      ${db.dailyWarning?`<div class="conflict" style="margin-top:10px">${esc(db.dailyWarning)}</div>`:""}
      <div class="patient-grid">
@@ -1019,6 +1161,7 @@ function startPatientEdit(id){
  pNurse2.value=p.nurseId2||"";
  pIntern.value=p.internId||"";
  pIntern2.value=p.internId2||"";
+ pUnit.value=p.unit||db.activeUnit;
  pSep.checked=!!p.separation;
  pSepAdjusted.checked=!!p.separationAdjusted;
  toggleSeparationAdjusted();
@@ -1032,6 +1175,7 @@ function cancelPatientEdit(){
  patientSaveButton.textContent="Ajouter";
  patientCancelButton.classList.add("hidden");
  pCode.value="";
+ pUnit.value=db.activeUnit;
  pSep.checked=false;
  pSepAdjusted.checked=false;
  toggleSeparationAdjusted();
@@ -1043,12 +1187,13 @@ function savePatientForm(){
  const code=pCode.value.trim();
  const nurseId=pNurse.value, nurseId2=pNurse2.value||null;
  const internId=pIntern.value, internId2=pIntern2.value||null;
+ const unit=pUnit.value;
  if(!code||!nurseId||!internId){alert("Renseigne au moins l’indicatif, un IDE et un interne.");return}
  if(editingPatientId){
    const p=patientById(editingPatientId); if(!p)return;
-   Object.assign(p,{code,nurseId,nurseId2,internId,internId2,separation:pSep.checked,separationAdjusted:pSep.checked&&pSepAdjusted.checked,tca:pTca.checked});
+   Object.assign(p,{code,unit,nurseId,nurseId2,internId,internId2,separation:pSep.checked,separationAdjusted:pSep.checked&&pSepAdjusted.checked,tca:pTca.checked});
  }else{
-   db.patients.push({id:crypto.randomUUID(),code,nurseId,nurseId2,internId,internId2,separation:pSep.checked,separationAdjusted:pSep.checked&&pSepAdjusted.checked,tca:pTca.checked});
+   db.patients.push({id:crypto.randomUUID(),code,unit,nurseId,nurseId2,internId,internId2,separation:pSep.checked,separationAdjusted:pSep.checked&&pSepAdjusted.checked,tca:pTca.checked});
  }
  cancelPatientEdit();
  save();
@@ -1119,13 +1264,62 @@ function myScheduleItems(day){
  db.constraints.filter(c=>c.personId==="me"&&c.day===day).forEach(c=>items.push({start:c.start,end:c.end,allDay:!!c.allDay,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
  return items.sort((a,b)=>a.start.localeCompare(b.start));
 }
-function renderMyPlanning(){
- if(typeof myPlanningContent==="undefined")return;
- myPlanningContent.innerHTML=DAYS.map(day=>{
-   const items=myScheduleItems(day);
-   return `<div class="planning-day"><h3>${day}</h3>${items.length?items.map(x=>`<div class="planning-item"><strong>${scheduleTimeLabel(x)}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span></div>`).join(""):"<div class='muted'>Aucun événement.</div>"}</div>`;
- }).join("");
+function planningItems(type,id,day){
+ if(type==="me")return myScheduleItems(day);
+ if(type==="patient"){const p=patientById(id);return p?patientScheduleItems(p,day):[]}
+ const items=[];
+ if(type==="nurse"){
+   const nurse=nurseById(id);
+   (nurse?.schedule?.[day]||[]).forEach(s=>items.push({start:s.start,end:s.end,label:`Présence IDE${s.code?` · ${s.code}`:""}`,origin:"Planning IDE"}));
+ }
+ db.constraints.filter(c=>c.personId===id&&c.day===day).forEach(c=>items.push({start:c.start,end:c.end,allDay:!!c.allDay,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
+ return items.sort((a,b)=>a.start.localeCompare(b.start));
 }
+function updatePlanningPeople(preserve=false){
+ if(typeof planningType==="undefined")return;
+ const type=planningType.value;
+ planningPersonWrap.classList.toggle("hidden",planningScope.value==="workshops"||type==="me");
+ if(type==="me"){renderPlanningHub();return}
+ const current=preserve?planningPerson.value:"";
+ const list=type==="patient"?visiblePatients():type==="intern"?db.interns:db.nurses;
+ planningPerson.innerHTML=list.map(person=>`<option value="${person.id}">${esc(person.code||person.name||person.alias||person.original)}</option>`).join("");
+ if(current&&list.some(person=>person.id===current))planningPerson.value=current;
+ renderPlanningHub();
+}
+function updatePlanningScope(){
+ const workshops=planningScope.value==="workshops";
+ planningTypeWrap.classList.toggle("hidden",workshops);
+ planningPersonWrap.classList.toggle("hidden",workshops||planningType.value==="me");
+ renderPlanningHub();
+}
+function movePlanningDay(direction){
+ const index=Math.max(0,DAYS.indexOf(planningDay.value));
+ planningDay.value=DAYS[(index+direction+DAYS.length)%DAYS.length];renderPlanningHub();
+}
+function planningEventHtml(item){
+ return `<div class="calendar-event ${item.recurring?"recurring":""}"><strong>${scheduleTimeLabel(item)}</strong><br>${esc(item.label)}${item.origin?`<br><span class="muted">${esc(item.origin)}</span>`:""}</div>`;
+}
+function renderPlanningHub(){
+ if(typeof myPlanningContent==="undefined")return;
+ if(!planningDay.options.length)planningDay.innerHTML=DAYS.map(day=>`<option>${day}</option>`).join("");
+ if(!planningDay.value)planningDay.value=db.selectedDay||defaultDay();
+ const workshopsMode=planningScope.value==="workshops",type=planningType.value,id=type==="me"?"me":planningPerson.value;
+ const entity=type==="patient"?patientById(id):type==="intern"?internById(id):type==="nurse"?nurseById(id):null;
+ const name=workshopsMode?"Ateliers":type==="me"?db.me:(entity?.code||entity?.name||entity?.alias||entity?.original||"Aucune personne");
+ planningDayWrap.classList.toggle("hidden",planningView.value!=="day");
+ planningTitle.innerHTML=`<strong>${workshopsMode?"Planning des ateliers":`Planning de ${esc(name)}`}</strong><br><span class="muted">${formatWeekRange()} · ${planningView.value==="week"?"Vue semaine":"Vue journée"}</span>`;
+ const itemsForDay=day=>workshopsMode
+   ?db.workshops.filter(w=>w.day===day).sort((a,b)=>a.start.localeCompare(b.start)).map(w=>({start:w.start,end:w.end,label:w.title,origin:w.leader||(w.recurring?"Récurrent":"Ponctuel"),recurring:!!w.recurring}))
+   :planningItems(type,id,day);
+ const days=planningView.value==="day"?[planningDay.value]:DAYS;
+ if(planningView.value==="week"){
+   myPlanningContent.innerHTML=`<div class="calendar-scroll" aria-label="Planning semaine, faire glisser horizontalement"><div class="calendar-week">${days.map(day=>{const items=itemsForDay(day);return `<div class="calendar-day"><h3>${day}</h3>${items.length?items.map(planningEventHtml).join(""):'<div class="calendar-empty">Aucun événement</div>'}</div>`}).join("")}</div></div><div class="swipe-hint">Glissez horizontalement pour parcourir la semaine</div>`;
+ }else{
+   const items=itemsForDay(days[0]);
+   myPlanningContent.innerHTML=`<div class="calendar-day"><h3>${days[0]}</h3>${items.length?items.map(planningEventHtml).join(""):'<div class="calendar-empty">Aucun événement</div>'}</div>`;
+ }
+}
+function renderMyPlanning(){updatePlanningPeople(true)}
 let previousPrintTitle="";
 function printPlanning(elementId,title){
  const target=document.getElementById(elementId);if(!target)return;
@@ -1307,11 +1501,12 @@ function toggleWeekOption(key,checked){db.weekOptions[key]=checked;save()}
 function addWorkshop(){
  const title=wTitle.value.trim(),day=wDay.value,start=wStart.value,end=wEnd.value;
  const leader=wLeader.value.trim(),capacity=Number(wCapacity.value)||null,category=wCategory.value||"";
+ const recurring=wRecurrence.value==="recurring";
  if(!title||!day||!start||!end||start>=end){alert("Vérifie le nom, le jour et les horaires.");return}
  db.workshops.push({
-   id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[],category,special:null,base:false,recurring:false
+   id:crypto.randomUUID(),title,day,start,end,leader,capacity,patientIds:[],category,special:null,base:false,recurring
  });
- wTitle.value="";wLeader.value="";wCapacity.value="";
+ wTitle.value="";wLeader.value="";wCapacity.value="";wRecurrence.value="once";
  save()
 }
 function editWorkshop(id){
@@ -1322,7 +1517,8 @@ function editWorkshop(id){
  const end=prompt("Heure de fin",w.end); if(end===null)return;
  const leader=prompt("Intervenant",w.leader||""); if(leader===null)return;
  const category=prompt("Catégorie : art-therapie / corporel / autre",w.category||""); if(category===null)return;
- Object.assign(w,{title:title.trim()||w.title,day:day.trim()||w.day,start:start.trim()||w.start,end:end.trim()||w.end,leader:leader.trim(),category:category.trim()});
+ const frequency=prompt("Fréquence : recurrent ou ponctuel",w.recurring?"recurrent":"ponctuel");if(frequency===null)return;
+ Object.assign(w,{title:title.trim()||w.title,day:day.trim()||w.day,start:start.trim()||w.start,end:end.trim()||w.end,leader:leader.trim(),category:category.trim(),recurring:normalizeHeader(frequency).startsWith("rec")});
  save();
 }
 function removeWorkshop(id){
@@ -1398,7 +1594,9 @@ function evaluate(p,day,start,end){
  return {ok:reasons.length===0,reasons,nurse:availableNurse||nurse,intern};
 }
 function findForPatient(){
- const p=patientById(sPatient.value); if(!p){patientResults.textContent="Ajoute un patient.";return}
+ const p=patientById(sPatient.value); if(!p){patientResults.textContent="Choisissez un patient.";return}
+ availabilityCard.classList.remove("hidden");
+ availabilityPatientTitle.textContent=p.code;
  const days=sDay.value?[sDay.value]:DAYS;
  let html="";
  for(const day of days){
@@ -1411,10 +1609,25 @@ function findForPatient(){
  }
  patientResults.innerHTML=html||`<div class="conflict">Aucun créneau compatible.</div>`;
 }
+function selectPatientFromSearch(id){
+ const patient=patientById(id);if(!patient)return;
+ sPatient.value=id;patientSearchInput.value=patient.code;patientSuggestions.innerHTML="";
+ patientSearchClear.classList.remove("hidden");findForPatient();
+}
+function searchPatientAvailability(query){
+ const normalized=String(query||"").trim().toLocaleLowerCase("fr");
+ patientSearchClear.classList.toggle("hidden",!normalized);
+ availabilityCard.classList.add("hidden");
+ if(!normalized){patientSuggestions.innerHTML=visiblePatients().length?`<span class="muted">Commencez à saisir un indicatif.</span>`:`<span class="muted">Aucun patient de ce côté.</span>`;return}
+ const matches=visiblePatients().filter(p=>p.code.toLocaleLowerCase("fr").includes(normalized)).slice(0,15);
+ patientSuggestions.innerHTML=matches.length?matches.map(p=>`<button class="patient-suggestion" onclick="selectPatientFromSearch('${p.id}')"><strong>${esc(p.code)}</strong><span>Voir les créneaux ›</span></button>`).join(""):`<div class="conflict">Aucun patient trouvé.</div>`;
+ if(matches.length===1&&matches[0].code.toLocaleLowerCase("fr")===normalized)selectPatientFromSearch(matches[0].id);
+}
+function clearPatientSearch(){patientSearchInput.value="";sPatient.value="";patientSuggestions.innerHTML="";availabilityCard.classList.add("hidden");patientSearchClear.classList.add("hidden");patientSearchInput.focus()}
 function findPatientsForSlot(){
  const day=fDay.value,start=fTime.value,end=toTime(toMin(start)+30);
  const possible=[],impossible=[];
- for(const p of db.patients){
+ for(const p of visiblePatients()){
    const allowed=daySlots(isSeparatedAt(p,day,start)).some(x=>x[0]===start);
    if(!allowed){impossible.push({p,reasons:["Créneau non autorisé"]});continue}
    const e=evaluate(p,day,start,end);
@@ -1434,6 +1647,8 @@ function importBackup(e){
 }
 function resetAll(){if(confirm("Effacer toutes les données locales ?")){localStorage.removeItem(DB_KEY);location.reload()}}
 function render(){
+ unitCoursButton.classList.toggle("active",db.activeUnit==="cours");
+ unitJardinButton.classList.toggle("active",db.activeUnit==="jardin");
  if(typeof workshopImportStatus!=="undefined" && db.workshops.length){
    workshopImportStatus.innerHTML=`<strong>${db.workshops.length} atelier(s) enregistré(s)</strong><br><span class="muted">Tu peux importer un nouveau tableau ou ajouter un atelier ponctuel.</span>`;
  }
@@ -1442,18 +1657,19 @@ function render(){
  pNurse2.innerHTML='<option value="">Aucun second IDE</option>'+db.nurses.map(n=>`<option value="${n.id}">${esc(n.alias)}</option>`).join("");
  pIntern.innerHTML=db.interns.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join("");
  pIntern2.innerHTML='<option value="">Aucun second interne</option>'+db.interns.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join("");
- patientList.innerHTML=db.patients.length?db.patients.map(p=>{
+ const displayedPatients=visiblePatients();
+ patientList.innerHTML=displayedPatients.length?displayedPatients.map(p=>{
    const nurses=[nurseById(p.nurseId),nurseById(p.nurseId2)].filter(Boolean).map(n=>n.alias).join(" / ")||"?";
    const interns=[internById(p.internId),internById(p.internId2)].filter(Boolean).map(i=>i.name).join(" / ")||"?";
-   return `<div class="person"><strong>${esc(p.code)}</strong> ${p.separation?'<span class="badge">Séparation</span>':''} ${p.tca?'<span class="badge">TCA</span>':''}
+   return `<div class="person"><strong>${esc(p.code)}</strong> <span class="badge">${p.unit==="jardin"?"Jardin":p.unit==="cours"?"Cours":"À affecter"}</span> ${p.separation?'<span class="badge">Séparation</span>':''} ${p.tca?'<span class="badge">TCA</span>':''}
    <br><span class="muted">IDE ${esc(nurses)} · Internes ${esc(interns)}</span>
    <div class="actions">
      <button class="secondary" onclick="openPatientDetail('${p.id}')">Voir le planning</button>
      <button class="secondary" onclick="startPatientEdit('${p.id}')">Modifier</button>
      <button class="danger" onclick="removePatient('${p.id}')">Supprimer</button>
    </div></div>`
- }).join(""):"Aucun patient.";
- const patientSelectOptions='<option value="">Choisir un patient</option>'+db.patients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
+ }).join(""):`Aucun patient côté ${db.activeUnit==="cours"?"Cours":"Jardin"}.`;
+ const patientSelectOptions='<option value="">Choisir un patient</option>'+displayedPatients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
  eventPatient.innerHTML=patientSelectOptions;
  recurringPatient.innerHTML=patientSelectOptions;
  eventDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
@@ -1468,7 +1684,10 @@ function render(){
  wDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  sDay.innerHTML='<option value="">Toute la semaine</option>'+DAYS.map(d=>`<option>${d}</option>`).join("");
  fDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
- sPatient.innerHTML=db.patients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
+ sPatient.innerHTML=displayedPatients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
+ if(typeof patientSearchInput!=="undefined"&&!patientSearchInput.value&&!patientSuggestions.innerHTML){
+   patientSuggestions.innerHTML=displayedPatients.length?`<span class="muted">Commencez à saisir un indicatif côté ${db.activeUnit==="cours"?"Cours":"Jardin"}.</span>`:`<span class="muted">Aucun patient de ce côté.</span>`;
+ }
  const sortedWorkshops=[...db.workshops].sort((a,b)=>{
    const da=DAYS.indexOf(a.day),dbi=DAYS.indexOf(b.day);
    return da-dbi || a.start.localeCompare(b.start);
@@ -1476,7 +1695,7 @@ function render(){
  workshopList.innerHTML=sortedWorkshops.length?sortedWorkshops.map(w=>{
    const enrolled=db.patients.filter(p=>w.patientIds.includes(p.id));
    const capacityText=w.capacity?`${enrolled.length}/${w.capacity} places`:`${enrolled.length} patient(s)`;
-   const patientChecks=db.patients.length?db.patients.map(p=>`
+   const patientChecks=displayedPatients.length?displayedPatients.map(p=>`
      <label class="switchline" style="margin:6px 0">
        <input type="checkbox" ${w.patientIds.includes(p.id)?"checked":""}
          onchange="toggleWorkshopPatient('${w.id}','${p.id}',this.checked)">
@@ -1486,6 +1705,7 @@ function render(){
      <strong>${esc(w.title)}</strong> <span class="badge">${esc(w.day)} ${w.start}–${w.end}</span>
      ${w.leader?`<span class="badge">${esc(w.leader)}</span>`:""}
      ${w.category?`<span class="badge">${esc(w.category)}</span>`:""}
+     <span class="badge">${w.recurring?"Récurrent":"Ponctuel"}</span>
      ${w.special?`<span class="badge">${esc(w.special)}</span>`:""}
      <br><span class="muted">${capacityText}</span>
      <details style="margin-top:8px">
@@ -1551,11 +1771,15 @@ function render(){
    weekClinicalCase.checked=!!db.weekOptions.clinicalCase;
  }
  if(typeof activityBalance!=="undefined"){
-   const noArt=db.patients.filter(p=>!db.workshops.some(w=>w.patientIds.includes(p.id)&&w.category==="art-therapie")).map(p=>p.code);
-   const noBody=db.patients.filter(p=>!db.workshops.some(w=>w.patientIds.includes(p.id)&&w.category==="corporel")).map(p=>p.code);
+   const balancePatients=visiblePatients();
+   const noArt=balancePatients.filter(p=>!db.workshops.some(w=>w.patientIds.includes(p.id)&&w.category==="art-therapie")).map(p=>p.code);
+   const noBody=balancePatients.filter(p=>!db.workshops.some(w=>w.patientIds.includes(p.id)&&w.category==="corporel")).map(p=>p.code);
+   const total=Math.max(balancePatients.length,1),artCovered=balancePatients.length-noArt.length,bodyCovered=balancePatients.length-noBody.length;
    activityBalance.innerHTML=`
-     <div class="person"><strong>0 art-thérapie</strong><br>${noArt.length?noArt.map(x=>`<span class="badge">${esc(x)}</span>`).join(""):"<span class='muted'>Aucun</span>"}</div>
-     <div class="person"><strong>0 corporel</strong><br>${noBody.length?noBody.map(x=>`<span class="badge">${esc(x)}</span>`).join(""):"<span class='muted'>Aucun</span>"}</div>`;
+     <div class="balance-grid">
+       <div class="balance-card"><div class="muted">Art-thérapie</div><div class="balance-score">${artCovered}/${balancePatients.length}</div><div class="balance-bar"><span style="width:${Math.round(artCovered/total*100)}%"></span></div><strong>${noArt.length?`${noArt.length} à inscrire`:"Équilibre atteint ✓"}</strong><div class="balance-missing">${noArt.map(x=>`<span class="badge">${esc(x)}</span>`).join("")}</div></div>
+       <div class="balance-card"><div class="muted">Activité corporelle</div><div class="balance-score">${bodyCovered}/${balancePatients.length}</div><div class="balance-bar"><span style="width:${Math.round(bodyCovered/total*100)}%"></span></div><strong>${noBody.length?`${noBody.length} à inscrire`:"Équilibre atteint ✓"}</strong><div class="balance-missing">${noBody.map(x=>`<span class="badge">${esc(x)}</span>`).join("")}</div></div>
+     </div>`;
  }
  if(typeof dashboardSummary!=="undefined"){
    dashboardSummary.innerHTML=`
