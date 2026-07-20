@@ -16,20 +16,21 @@
       --soft:#fffdfc;--soft-strong:#f3e7e4;
     }
     *{box-sizing:border-box}
-    body{margin:0;background-color:#a83a25;background-image:radial-gradient(circle at 18% 10%,rgba(255,242,218,.86) 0 13%,transparent 34%),radial-gradient(circle at 82% 58%,rgba(238,151,98,.72) 0 18%,transparent 48%),radial-gradient(circle at 16% 88%,rgba(118,20,13,.88) 0 19%,transparent 52%),linear-gradient(145deg,#f1c6a4 0%,#c66c48 58%,#8f2017 100%);background-attachment:fixed;color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}
+    body{margin:0;background-color:#a83a25;background-image:radial-gradient(circle at 18% 10%,rgba(255,242,218,.86) 0 13%,transparent 34%),radial-gradient(circle at 82% 58%,rgba(238,151,98,.72) 0 18%,transparent 48%),radial-gradient(circle at 16% 88%,rgba(118,20,13,.88) 0 19%,transparent 52%),linear-gradient(145deg,#f1c6a4 0%,#c66c48 58%,#8f2017 100%);background-attachment:fixed;color:var(--ink);font:15px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}
     body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.09;background-image:repeating-radial-gradient(circle at 0 0,rgba(74,19,12,.7) 0 1px,transparent 1px 4px);mix-blend-mode:multiply}
-    header{position:sticky;top:0;z-index:5;padding:22px 26px;background:rgba(184,102,77,.97);-webkit-backdrop-filter:saturate(150%) blur(18px);backdrop-filter:saturate(150%) blur(18px);border-bottom:1px solid rgba(255,255,255,.28)}
+    header{position:sticky;top:0;z-index:5;padding:10px 18px;background:rgba(184,102,77,.97);-webkit-backdrop-filter:saturate(150%) blur(18px);backdrop-filter:saturate(150%) blur(18px);border-bottom:1px solid rgba(255,255,255,.28)}
     .header-content{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    header h1{margin:0;font-size:27px;letter-spacing:.01em;color:white;display:flex;align-items:center;gap:11px}
+    .header-actions{display:flex;align-items:center;gap:7px}
+    header h1{margin:0;font-size:21px;letter-spacing:.01em;color:white;display:flex;align-items:center;gap:8px}
     .settings-button{width:42px;height:42px;padding:0;border-radius:50%;border-color:rgba(255,255,255,.72);background:rgba(255,255,255,.18);box-shadow:none;display:grid;place-items:center}
     .settings-button svg{width:23px;height:23px;fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .brand-mark{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 4px 16px rgba(83,21,15,.18)}
-    .brand-mark svg{width:27px;height:27px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-    header small{color:white;font-size:16px}
+    .brand-mark{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 4px 16px rgba(83,21,15,.18)}
+    .brand-mark svg{width:21px;height:21px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    header small{display:block;color:rgba(255,255,255,.86);font-size:11px;margin:1px 0 0 38px;line-height:1.15}
     main{max-width:920px;margin:auto;padding:14px}
     .card{background:var(--paper);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.9);border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 2px 4px rgba(83,21,15,.07),0 12px 34px rgba(83,21,15,.12)}
-    h2{font-size:20px;margin:0 0 10px;color:var(--ink)}
-    h3{font-size:15px;margin:12px 0 6px}
+    h2{font-size:16px;margin:0 0 7px;color:var(--ink)}
+    h3{font-size:15px;margin:10px 0 5px}
     label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
     input,select,button{font:inherit}
     input,select{width:100%;padding:11px 12px;border:1px solid rgba(164,83,65,.25);border-radius:12px;background:rgba(255,255,255,.96);color:#671a14;box-shadow:0 1px 2px rgba(83,21,15,.04)}
@@ -99,7 +100,7 @@
     .data-section-title{margin-top:18px;padding-top:15px;border-top:1px solid rgba(255,255,255,.82);color:var(--rose)}
     .toast{position:fixed;right:20px;bottom:20px;z-index:30;max-width:340px;padding:12px 16px;border-radius:14px;background:var(--navy);color:white;box-shadow:0 12px 34px rgba(87,11,7,.24)}
     .search-hero{padding:18px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(249,237,233,.94))}
-    .search-hero h2{font-size:25px;margin-bottom:4px}
+    .search-hero h2{font-size:17px;margin-bottom:3px}
     .search-box{position:relative;margin-top:16px}
     .search-box input{height:54px;padding:13px 46px 13px 44px;border-radius:17px;font-size:18px;font-weight:650;background:white}
     .search-box svg{position:absolute;left:15px;top:16px;width:22px;height:22px;stroke:var(--rose);fill:none;stroke-width:2}
@@ -116,13 +117,16 @@
     .unit-button{min-height:38px;padding:7px 14px;border:0;border-radius:10px;background:transparent;color:var(--navy);box-shadow:none}
     .unit-button.active{background:white;color:var(--navy);box-shadow:0 2px 9px rgba(83,21,15,.15)}
     .unit-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:currentColor}
+    .header-unit-switch{display:grid;grid-template-columns:34px 34px;gap:2px;padding:3px;border-radius:14px}
+    .header-unit-switch .unit-button{width:34px;min-height:34px;padding:0;border-radius:11px;display:grid;place-items:center}
+    .header-unit-switch svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
     .swipe-hint{text-align:center;font-size:11px;color:var(--muted);margin:-3px 0 7px}
     .planning-controls{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin:12px 0}
     .planning-summary{padding:12px 14px;border-radius:14px;background:var(--soft-strong);margin:10px 0}
     .balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .balance-card{padding:14px;border-radius:16px;background:white;border:1px solid var(--line)}
-    .balance-score{font-size:25px;font-weight:850;color:var(--navy);line-height:1.1}
-    .balance-bar{height:7px;background:var(--soft-strong);border-radius:99px;overflow:hidden;margin:9px 0}
+    .balance-card{padding:10px;border-radius:14px;background:white;border:1px solid var(--line);font-size:12px}
+    .balance-score{font-size:19px;font-weight:800;color:var(--navy);line-height:1.1;margin-top:2px}
+    .balance-bar{height:5px;background:var(--soft-strong);border-radius:99px;overflow:hidden;margin:6px 0}
     .balance-bar span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--rose),var(--navy))}
     .balance-missing{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
     .calendar-scroll{overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:8px;-webkit-overflow-scrolling:touch}
@@ -134,6 +138,23 @@
     .calendar-empty{font-size:13px;color:var(--muted);padding:12px 2px}
     .day-navigation{display:grid;grid-template-columns:40px 1fr 40px;gap:7px;align-items:center;margin:10px 0}
     .day-navigation button{width:40px;height:40px;padding:0}
+    .icon-action{width:38px;height:38px;padding:0;display:inline-grid;place-items:center;flex:0 0 auto;border-radius:12px}
+    .icon-action svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .icon-action.compact{width:31px;height:31px;border-radius:9px;margin-left:6px;vertical-align:middle}
+    .icon-action.compact svg{width:15px;height:15px}
+    .data-action-row{display:grid;grid-template-columns:minmax(0,1fr) 38px;gap:8px;align-items:center}
+    .data-action-row .actions{margin:0;justify-content:flex-end}
+    .record-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start}
+    .record-row>.actions{margin:0;flex-wrap:nowrap}
+    .import-line{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;align-items:center;margin-top:8px}
+    .import-line input{min-width:0;height:40px;padding:7px 8px;font-size:12px}
+    .import-line button{height:40px;padding:7px 10px;font-size:13px;white-space:nowrap}
+    .data-state-details{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.82)}
+    .data-state-details>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none;cursor:pointer;font-weight:750;color:var(--ink)}
+    .data-state-details>summary::-webkit-details-marker{display:none}
+    .state-indicator{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:750}
+    .state-indicator:before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+    .state-indicator.green{color:#3f6d3a;background:#e6f1e3}.state-indicator.orange{color:#8a641a;background:#fff0c9}.state-indicator.red{color:#943d34;background:#f7dcd7}
     /* Direction iOS 26 : chrome translucide, contenu calme et contrôles concentriques */
     :root{--glass:rgba(255,248,246,.72);--glass-strong:rgba(255,252,250,.9);--glass-line:rgba(255,255,255,.76);--shadow:0 14px 44px rgba(91,25,17,.13)}
     header{background:linear-gradient(180deg,rgba(177,77,53,.88),rgba(177,77,53,.72));border-bottom:1px solid rgba(255,255,255,.32);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%)}
@@ -167,10 +188,20 @@
     @media(min-width:901px){body{padding-left:198px}header{margin-left:-198px;padding-left:224px}}
     @media(max-width:900px){
       body{padding-bottom:108px}
-      main{padding:10px}
-      header{padding:20px 26px}
-      header h1{font-size:26px}
-      header small{font-size:16px}
+      main{padding:8px 10px}
+      .card{padding:12px;border-radius:22px;margin-bottom:10px}
+      header{padding:7px 12px}
+      header h1{font-size:19px}
+      header small{font-size:10px;margin-left:36px}
+      .brand-mark{width:28px;height:28px;border-radius:8px}
+      .brand-mark svg{width:20px;height:20px}
+      .settings-button{width:36px;height:36px}
+      .settings-button svg{width:20px;height:20px}
+      .search-hero{padding:14px}
+      .search-box{margin-top:12px}
+      .search-box input{height:48px;font-size:16px;border-radius:15px}
+      .search-box svg{top:13px}
+      .search-clear{top:5px}
       .main-nav{left:0;right:0;top:auto;bottom:0;width:auto;border-radius:18px 18px 0 0;padding:7px calc(7px + env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) calc(7px + env(safe-area-inset-left));background:rgba(255,255,255,.96)}
       .main-nav{left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));border-radius:25px;padding:6px;background:rgba(255,248,246,.72);border:1px solid rgba(255,255,255,.78);box-shadow:0 12px 38px rgba(83,21,15,.2);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%)}
       .main-nav .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
@@ -180,16 +211,17 @@
       .main-nav .nav-label{display:block}
       .main-nav .nav-icon{width:24px;height:24px}
       .daily-sticky{top:96px}
-      .daily-toolbar{grid-template-columns:42px 42px minmax(0,1fr) 42px;gap:6px}
-      .daily-toolbar button{width:42px;height:42px}
-      .daily-toolbar select{height:42px;padding-left:9px;padding-right:24px}
+      .daily-toolbar{grid-template-columns:minmax(0,1fr) 38px;gap:6px}
+      .daily-toolbar label{grid-column:1/3;grid-row:1;padding-left:2px}
+      .daily-toolbar select{grid-column:1;grid-row:2;width:100%;height:40px;padding:8px 28px 8px 10px;font-size:14px}
+      .daily-toolbar .daily-add{grid-column:2;grid-row:2;width:38px;height:40px}
+      .daily-toolbar .daily-prev,.daily-toolbar .daily-next{display:none}
       .week-picker{grid-template-columns:minmax(102px,auto) 38px minmax(128px,1fr) 38px;gap:5px}
       .week-picker>label{font-size:14px}
       .week-picker button{width:38px;height:42px}
       .toast{left:12px;right:12px;bottom:92px;max-width:none}
-      .unit-switch-wrap{top:93px;padding:7px 10px 0}
       #daily>.card:first-child{padding:10px 12px;margin-bottom:8px}
-      #daily>.card:first-child h2{font-size:16px;margin-bottom:2px}
+      #daily>.card:first-child h2{font-size:15px;margin-bottom:2px}
       #daily>.card:nth-child(2){padding:9px 10px}
       #daily .daily-sticky{position:static;padding:0 0 6px}
       #daily .daily-card{margin:5px 0}
@@ -203,7 +235,10 @@
       #daily .daily-toolbar select,#daily .daily-toolbar button{height:38px}
       #daily .daily-toolbar button{width:38px}
       .planning-controls{grid-template-columns:1fr}
-      .balance-grid{grid-template-columns:1fr}
+      .balance-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+      .balance-missing .badge{font-size:10px;padding:2px 5px;margin:0}
+      .import-line{grid-template-columns:minmax(0,1fr) auto auto;gap:5px}
+      .import-line button{padding:7px 8px;font-size:12px}
     }
   </style>
 </head>
@@ -211,15 +246,15 @@
 <header>
   <div class="header-content">
     <div><h1><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10"/><path d="M16 16 23 9M16 6v3M16 23v3M6 16h3M23 16h3"/><circle cx="16" cy="16" r="2.2" fill="currentColor" stroke="none"/></svg></span> ATC</h1><small>Tour de contrôle des entretiens</small></div>
-    <button class="settings-button" onclick="activateTab('more')" aria-label="Réglages et données" title="Réglages et données"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.55v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-1.51-1H2.5V10h.09A1.7 1.7 0 0 0 4.1 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.56 4.2l.06.06A1.7 1.7 0 0 0 8.5 4.6a1.7 1.7 0 0 0 1-1.51V3h4v.09a1.7 1.7 0 0 0 1 1.51 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 18.9 9a1.7 1.7 0 0 0 1.51 1h.09v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg></button>
+    <div class="header-actions">
+      <div class="unit-switch header-unit-switch" aria-label="Côté affiché">
+        <button id="unitCoursButton" class="unit-button active" onclick="setActiveUnit('cours')" aria-label="Afficher le côté Cours" title="Cours"><svg viewBox="0 0 24 24"><path d="M5 20V6l7-3 7 3v14M3 20h18M9 8h2M13 8h2M9 12h2M13 12h2M10 20v-4h4v4"/></svg></button>
+        <button id="unitJardinButton" class="unit-button" onclick="setActiveUnit('jardin')" aria-label="Afficher le côté Jardin" title="Jardin"><svg viewBox="0 0 24 24"><path d="M12 21V9M12 14c-4.5 0-7-2.6-7-7 4.5 0 7 2.6 7 7ZM12 11c0-4.5 2.6-7 7-7 0 4.5-2.6 7-7 7Z"/></svg></button>
+      </div>
+      <button class="settings-button" onclick="activateTab('more')" aria-label="Réglages et données" title="Réglages et données"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.55v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-1.51-1H2.5V10h.09A1.7 1.7 0 0 0 4.1 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.56 4.2l.06.06A1.7 1.7 0 0 0 8.5 4.6a1.7 1.7 0 0 0 1-1.51V3h4v.09a1.7 1.7 0 0 0 1 1.51 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 18.9 9a1.7 1.7 0 0 0 1.51 1h.09v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg></button>
+    </div>
   </div>
 </header>
-<div class="unit-switch-wrap" aria-label="Côté affiché">
-  <div class="unit-switch">
-    <button id="unitCoursButton" class="unit-button active" onclick="setActiveUnit('cours')"><span class="unit-dot"></span>Cours</button>
-    <button id="unitJardinButton" class="unit-button" onclick="setActiveUnit('jardin')"><span class="unit-dot"></span>Jardin</button>
-  </div>
-</div>
 <main>
   <div class="card main-nav">
     <div class="tabs">
@@ -285,12 +320,11 @@
       <h2>Données de la semaine</h2>
       <div class="person">
         <strong>Planning IDE</strong><br><span class="muted">À importer pour la semaine sélectionnée</span>
-        <div class="actions"><input id="excelFile" type="file" accept=".xls,.xlsx"><button id="prepareWeekButton" onclick="prepareSimpleWeek()">Importer le planning IDE</button></div>
+        <div class="import-line"><input id="excelFile" type="file" accept=".xls,.xlsx"><button id="prepareWeekButton" onclick="prepareSimpleWeek()">Importer</button><button id="undoImportButton" class="secondary" onclick="undoLastImport()" aria-label="Annuler le dernier import IDE">Annuler</button></div>
       </div>
-      <div class="person"><strong>Liste des patients</strong> · <span id="patientStatusText">À jour</span><div class="actions"><button class="secondary" onclick="activateTab('patients')">Modifier</button></div></div>
-      <div class="person"><strong>Calendrier des ateliers</strong> · <span id="workshopStatusText">À jour</span><div class="actions"><button class="secondary" onclick="activateTab('workshops')">Modifier</button></div></div>
-      <div class="person"><strong>Prises en charge récurrentes</strong> · <span id="recurringStatusText">À jour</span><div class="actions"><button class="secondary" onclick="activateTab('patients');scrollToRecurring()">Modifier</button></div></div>
-      <div class="actions"><button id="undoImportButton" class="secondary" onclick="undoLastImport()">Annuler le dernier import IDE</button></div>
+      <div class="person data-action-row"><div><strong>Liste des patients</strong> · <span id="patientStatusText">À jour</span></div><div class="actions"><button class="secondary icon-action" onclick="activateTab('patients')" aria-label="Modifier les patients" title="Modifier"><svg viewBox="0 0 24 24"><path d="m4 20 4.2-1 10.7-10.7a2.1 2.1 0 0 0-3-3L5.2 16 4 20ZM14.5 6.7l3 3"/></svg></button></div></div>
+      <div class="person data-action-row"><div><strong>Calendrier des ateliers</strong> · <span id="workshopStatusText">À jour</span></div><div class="actions"><button class="secondary icon-action" onclick="activateTab('workshops')" aria-label="Modifier les ateliers" title="Modifier"><svg viewBox="0 0 24 24"><path d="m4 20 4.2-1 10.7-10.7a2.1 2.1 0 0 0-3-3L5.2 16 4 20ZM14.5 6.7l3 3"/></svg></button></div></div>
+      <div class="person data-action-row"><div><strong>Prises en charge récurrentes</strong> · <span id="recurringStatusText">À jour</span></div><div class="actions"><button class="secondary icon-action" onclick="activateTab('patients');scrollToRecurring()" aria-label="Modifier les prises en charge récurrentes" title="Modifier"><svg viewBox="0 0 24 24"><path d="m4 20 4.2-1 10.7-10.7a2.1 2.1 0 0 0-3-3L5.2 16 4 20ZM14.5 6.7l3 3"/></svg></button></div></div>
       <div id="weekPreparationStatus" class="status muted" style="margin-top:10px">Le planning IDE n’a pas encore été actualisé.</div>
 
       <h3 class="data-section-title">Ajouter un événement ponctuel</h3>
@@ -310,9 +344,11 @@
       <h3 class="data-section-title">Options de la semaine</h3>
       <label class="switchline"><input id="weekBibliography" type="checkbox" onchange="toggleWeekOption('bibliography',this.checked)"> Bibliographie lundi 11 h–12 h</label>
       <label class="switchline" style="margin-top:10px"><input id="weekClinicalCase" type="checkbox" onchange="toggleWeekOption('clinicalCase',this.checked)"> Cas clinique jeudi 11 h–12 h</label>
-      <h3 class="data-section-title">État des données</h3>
-      <div id="dashboardSummary"></div>
-      <div id="dataChecklist"></div>
+      <details id="dataStateDetails" class="data-state-details">
+        <summary>État des données <span id="dataStateIndicator" class="state-indicator orange">À vérifier</span></summary>
+        <div id="dashboardSummary"></div>
+        <div id="dataChecklist"></div>
+      </details>
     </div>
 
     <div class="card">
@@ -506,6 +542,8 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const DAYS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi"];
+const EDIT_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.2-1 10.7-10.7a2.1 2.1 0 0 0-3-3L5.2 16 4 20ZM14.5 6.7l3 3"/></svg>';
+const DELETE_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>';
 const DAY_CODES={L:"Lundi",M:"Mardi",ME:"Mercredi",J:"Jeudi",V:"Vendredi",S:"Samedi",D:"Dimanche"};
 const SHIFT={
   "M":["07:30","15:30"], "S":["13:00","20:30"], "J":["09:00","17:00"],
@@ -1345,13 +1383,13 @@ function renderPatientDetail(){
  const days=DAYS.map(day=>{
    const items=patientScheduleItems(p,day);
    return `<div class="planning-day"><h3>${day}</h3>
-     ${items.length?items.map(x=>`<div class="planning-item"><strong>${scheduleTimeLabel(x)}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span> <button class="secondary" style="padding:4px 8px;margin-left:6px" onclick="editPatientScheduleItem('${x.source}','${x.id}')">Modifier</button></div>`).join(""):"<div class='muted'>Aucune activité ou contrainte.</div>"}
+     ${items.length?items.map(x=>`<div class="planning-item"><strong>${scheduleTimeLabel(x)}</strong> · ${esc(x.label)} <span class="badge">${esc(x.origin)}</span><button class="secondary icon-action compact" onclick="editPatientScheduleItem('${x.source}','${x.id}')" aria-label="Modifier cet événement" title="Modifier">${EDIT_ICON}</button></div>`).join(""):"<div class='muted'>Aucune activité ou contrainte.</div>"}
    </div>`;
  }).join("");
  patientDetail.innerHTML=`<h2>${esc(p.code)}</h2>
    <div class="muted">IDE ${esc(nurses)} · Internes ${esc(interns)}</div>
    <div style="margin-top:8px">${p.separation?`<span class="badge">${p.separationAdjusted?"Séparation aménagée":"Séparation complète"}</span>`:""}${p.tca?'<span class="badge">TCA</span>':""}</div>
-   <div class="actions print-hide"><button onclick="startPatientEdit('${p.id}')">Modifier</button><button class="secondary" onclick="printPlanning('patientDetailCard','Planning – ${esc(p.code)}')">Imprimer / PDF</button><button class="danger" onclick="removePatient('${p.id}');closePatientDetail()">Supprimer</button></div>
+   <div class="actions print-hide"><button class="secondary icon-action" onclick="startPatientEdit('${p.id}')" aria-label="Modifier ${esc(p.code)}" title="Modifier">${EDIT_ICON}</button><button class="secondary" onclick="printPlanning('patientDetailCard','Planning – ${esc(p.code)}')">Imprimer / PDF</button><button class="danger icon-action" onclick="removePatient('${p.id}');closePatientDetail()" aria-label="Supprimer ${esc(p.code)}" title="Supprimer">${DELETE_ICON}</button></div>
    <hr><h2>Planning par patient</h2>${days}`;
 }
 
@@ -1661,12 +1699,12 @@ function render(){
  patientList.innerHTML=displayedPatients.length?displayedPatients.map(p=>{
    const nurses=[nurseById(p.nurseId),nurseById(p.nurseId2)].filter(Boolean).map(n=>n.alias).join(" / ")||"?";
    const interns=[internById(p.internId),internById(p.internId2)].filter(Boolean).map(i=>i.name).join(" / ")||"?";
-   return `<div class="person"><strong>${esc(p.code)}</strong> <span class="badge">${p.unit==="jardin"?"Jardin":p.unit==="cours"?"Cours":"À affecter"}</span> ${p.separation?'<span class="badge">Séparation</span>':''} ${p.tca?'<span class="badge">TCA</span>':''}
-   <br><span class="muted">IDE ${esc(nurses)} · Internes ${esc(interns)}</span>
+   return `<div class="person record-row"><div><strong>${esc(p.code)}</strong> <span class="badge">${p.unit==="jardin"?"Jardin":p.unit==="cours"?"Cours":"À affecter"}</span> ${p.separation?'<span class="badge">Séparation</span>':''} ${p.tca?'<span class="badge">TCA</span>':''}
+   <br><span class="muted">IDE ${esc(nurses)} · Internes ${esc(interns)}</span></div>
    <div class="actions">
      <button class="secondary" onclick="openPatientDetail('${p.id}')">Voir le planning</button>
-     <button class="secondary" onclick="startPatientEdit('${p.id}')">Modifier</button>
-     <button class="danger" onclick="removePatient('${p.id}')">Supprimer</button>
+     <button class="secondary icon-action" onclick="startPatientEdit('${p.id}')" aria-label="Modifier ${esc(p.code)}" title="Modifier">${EDIT_ICON}</button>
+     <button class="danger icon-action" onclick="removePatient('${p.id}')" aria-label="Supprimer ${esc(p.code)}" title="Supprimer">${DELETE_ICON}</button>
    </div></div>`
  }).join(""):`Aucun patient côté ${db.activeUnit==="cours"?"Cours":"Jardin"}.`;
  const patientSelectOptions='<option value="">Choisir un patient</option>'+displayedPatients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
@@ -1675,7 +1713,7 @@ function render(){
  eventDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  recurringDay.innerHTML=DAYS.map(d=>`<option>${d}</option>`).join("");
  recurringCareList.innerHTML=db.recurringCare.length?db.recurringCare.slice().sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||a.start.localeCompare(b.start)).map(c=>{
-   const patient=patientById(c.patientId);return `<div class="person"><strong>${esc(patient?.code||"Patient supprimé")}</strong> · ${esc(c.label)} <span class="badge">${esc(c.day)} ${c.start}–${c.end}</span><div class="actions"><button class="secondary" onclick="editRecurringCare('${c.id}')">Modifier</button><button class="danger" onclick="removeRecurringCare('${c.id}')">Supprimer</button></div></div>`
+   const patient=patientById(c.patientId);return `<div class="person record-row"><div><strong>${esc(patient?.code||"Patient supprimé")}</strong> · ${esc(c.label)} <span class="badge">${esc(c.day)} ${c.start}–${c.end}</span></div><div class="actions"><button class="secondary icon-action" onclick="editRecurringCare('${c.id}')" aria-label="Modifier cette prise en charge" title="Modifier">${EDIT_ICON}</button><button class="danger icon-action" onclick="removeRecurringCare('${c.id}')" aria-label="Supprimer cette prise en charge" title="Supprimer">${DELETE_ICON}</button></div></div>`
  }).join(""):"<span class='muted'>Aucune prise en charge récurrente.</span>";
  patientStatusText.textContent=db.patients.length?`${db.patients.length} patient(s) · À jour`:"À compléter";
  workshopStatusText.textContent=db.workshops.length?`${db.workshops.length} atelier(s) · À jour`:"À compléter";
@@ -1702,17 +1740,18 @@ function render(){
        <span>${esc(p.code)}</span>
      </label>`).join(""):"<span class='muted'>Ajoute d’abord des patients.</span>";
    return `<div class="person">
-     <strong>${esc(w.title)}</strong> <span class="badge">${esc(w.day)} ${w.start}–${w.end}</span>
-     ${w.leader?`<span class="badge">${esc(w.leader)}</span>`:""}
-     ${w.category?`<span class="badge">${esc(w.category)}</span>`:""}
-     <span class="badge">${w.recurring?"Récurrent":"Ponctuel"}</span>
-     ${w.special?`<span class="badge">${esc(w.special)}</span>`:""}
-     <br><span class="muted">${capacityText}</span>
+     <div class="record-row"><div><strong>${esc(w.title)}</strong> <span class="badge">${esc(w.day)} ${w.start}–${w.end}</span>
+       ${w.leader?`<span class="badge">${esc(w.leader)}</span>`:""}
+       ${w.category?`<span class="badge">${esc(w.category)}</span>`:""}
+       <span class="badge">${w.recurring?"Récurrent":"Ponctuel"}</span>
+       ${w.special?`<span class="badge">${esc(w.special)}</span>`:""}
+       <br><span class="muted">${capacityText}</span></div>
+       <div class="actions"><button class="secondary icon-action" onclick="editWorkshop('${w.id}')" aria-label="Modifier ${esc(w.title)}" title="Modifier">${EDIT_ICON}</button><button class="danger icon-action" onclick="removeWorkshop('${w.id}')" aria-label="Supprimer ${esc(w.title)}" title="Supprimer">${DELETE_ICON}</button></div>
+     </div>
      <details style="margin-top:8px">
        <summary>Inscrire les patients</summary>
        <div style="padding-top:6px">${patientChecks}</div>
      </details>
-     <div class="actions"><button class="secondary" onclick="editWorkshop('${w.id}')">Modifier</button><button class="secondary" onclick="removeWorkshop('${w.id}')">Supprimer l’atelier</button></div>
    </div>`;
  }).join(""):"Aucun atelier créé.";
  const agendaPatients='<option value="">Choisir un patient</option>'+db.patients.map(p=>`<option value="${p.id}">${esc(p.code)}</option>`).join("");
@@ -1763,7 +1802,7 @@ function render(){
      </select></div>
      <div><label>Intervenant</label><input value="${esc(rule.leader||"")}" onchange="updateAgendaRule('${rule.id}','leader',this.value)"></div>
    </div>
-   <div class="actions"><button class="danger" onclick="removeAgendaRule('${rule.id}')">Supprimer</button></div>
+   <div class="actions"><button class="danger icon-action" onclick="removeAgendaRule('${rule.id}')" aria-label="Supprimer cette règle" title="Supprimer">${DELETE_ICON}</button></div>
  </div>`).join("");
 
  if(typeof weekBibliography!=="undefined"){
@@ -1801,9 +1840,14 @@ function render(){
    {ok:ambiguous.length===0,label:ambiguous.length?`${ambiguous.length} événement(s) Agenda ambigu(s)`:"Aucun événement ambigu"}
  ];
  dataChecklist.innerHTML=checklist.map(item=>`<div class="person ${item.ok?"ok":"warn"}" style="padding:9px;border-radius:9px;margin:6px 0"><strong>${item.ok?"✓":"!"}</strong> ${esc(item.label)}</div>`).join("");
+ const criticalState=!db.patients.length||!db.importedAt;
+ const warningState=!db.workshops.length||missingNurse.length>0||missingIntern.length>0||ambiguous.length>0;
+ const stateTone=criticalState?"red":warningState?"orange":"green";
+ dataStateIndicator.className=`state-indicator ${stateTone}`;
+ dataStateIndicator.textContent=criticalState?"Incomplet":warningState?"À vérifier":"Tout est prêt";
  const archiveKeys=Object.keys(db.weeks).filter(key=>key!==db.selectedWeekStart).sort().reverse();
  archivedWeekCount.textContent=archiveKeys.length;
- archivedWeeks.innerHTML=archiveKeys.length?archiveKeys.map(key=>`<div class="person"><strong>${weekRangeFromKey(key)}</strong><div class="actions"><button class="secondary" onclick="switchSelectedWeek('${key}')">Ouvrir</button><button class="danger" onclick="deleteArchivedWeek('${key}')">Supprimer</button></div></div>`).join(""):"<span class='muted'>Aucune semaine archivée.</span>";
+ archivedWeeks.innerHTML=archiveKeys.length?archiveKeys.map(key=>`<div class="person"><strong>${weekRangeFromKey(key)}</strong><div class="actions"><button class="secondary" onclick="switchSelectedWeek('${key}')">Ouvrir</button><button class="danger icon-action" onclick="deleteArchivedWeek('${key}')" aria-label="Supprimer cette archive" title="Supprimer">${DELETE_ICON}</button></div></div>`).join(""):"<span class='muted'>Aucune semaine archivée.</span>";
  agendaRuleCount.textContent=db.agendaRules.length;
  undoImportButton.disabled=!db.lastImportBackup;
  weekStartInput.value=dateInputValue(startOfSelectedWeek());
