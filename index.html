@@ -81,16 +81,25 @@
     .planning-day{margin:14px 0}
     .planning-item{padding:9px 10px;border-radius:10px;background:var(--soft-strong);margin:6px 0}
     .planning-free{background:var(--green)}
-    .main-nav{position:fixed;left:14px;top:116px;width:170px;z-index:12;margin:0;padding:9px;background:rgba(255,255,255,.9)}
+    .main-nav{position:fixed;left:14px;top:170px;width:170px;z-index:12;margin:0;padding:9px;background:rgba(255,255,255,.9)}
     .main-nav .tabs{display:grid;overflow:visible}
     .main-nav .tab{display:flex;align-items:center;gap:9px;text-align:left;width:100%}
+    .nav-search{position:fixed;left:14px;top:116px;z-index:13;display:flex;align-items:center;gap:9px;width:170px;background:rgba(255,255,255,.9);color:var(--navy);box-shadow:none}
+    .nav-add{display:none}
+    #search{position:fixed;inset:0;z-index:40;overflow-y:auto;padding:72px 12px 112px;background:rgba(55,31,27,.22);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+    #search>.card{width:min(100%,680px);margin-left:auto;margin-right:auto}
+    #search:not(.event-mode)>#eventCreatorCard{display:none}
+    #search.event-mode>:not(.sheet-close):not(#eventCreatorCard){display:none}
+    .sheet-close{position:fixed;z-index:42;top:18px;right:18px;width:40px;height:40px;padding:0;border-radius:50%;font-size:22px;background:var(--glass-strong);color:var(--ink);border-color:var(--glass-line)}
+    .edit-overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:end center;padding:16px;background:rgba(55,31,27,.24);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+    .edit-overlay.hidden{display:none!important}.edit-sheet{width:min(100%,560px);max-height:88vh;overflow:auto;margin:0;border-radius:28px}
     .nav-icon{width:21px;height:21px;display:block;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
     .daily-sticky{position:sticky;top:100px;z-index:4;background:transparent;padding:4px 0 12px;border-bottom:1px solid rgba(255,255,255,.8)}
-    .daily-toolbar{display:grid;grid-template-columns:44px 44px minmax(0,1fr) 44px;gap:8px;align-items:end}
-    .daily-toolbar label{grid-column:1/5;margin:0 0 -3px;padding-left:5px;color:var(--rose);font-size:16px;font-weight:800}
+    .daily-toolbar{display:grid;grid-template-columns:44px 44px minmax(0,1fr) 44px 44px;gap:8px;align-items:end}
+    .daily-toolbar label{grid-column:1/6;margin:0 0 -3px;padding-left:5px;color:var(--rose);font-size:16px;font-weight:800}
     .daily-toolbar select{grid-column:3;grid-row:2;min-width:0;height:44px}
     .daily-toolbar button{grid-row:2;width:44px;height:44px;padding:0;display:grid;place-items:center;font-size:25px;line-height:1}
-    .daily-add{grid-column:1}
+    .daily-edit{grid-column:1}.daily-pause{grid-column:5}
     .daily-prev{grid-column:2}
     .daily-next{grid-column:4}
     .week-picker{display:grid;grid-template-columns:auto 42px minmax(150px,220px) 42px;gap:8px;align-items:center;margin-top:14px}
@@ -192,6 +201,24 @@
     .empty-state button{margin-top:8px;padding:8px 11px;border-radius:12px;font-size:13px;font-weight:700}
     .section-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:3px}
     .section-title-row h2{margin:0}
+    .control-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:10px}
+    .control-toolbar input[type="range"]{padding:0;box-shadow:none;background:transparent}
+    .control-now{height:38px;padding:7px 10px}
+    .control-groups{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+    .control-group-title{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+    .control-patient{width:100%;display:grid;grid-template-columns:minmax(74px,.7fr) minmax(0,1.3fr);gap:7px;align-items:center;padding:8px 2px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);box-shadow:none;text-align:left;font-size:12px;font-weight:400}
+    .control-patient:last-child{border-bottom:0}
+    .control-patient strong{font-size:13px}
+    .control-patient small{display:block;color:var(--muted);font-size:10px;margin-top:1px}
+    .control-kind{display:inline-block;margin-top:3px;padding:2px 5px;border-radius:999px;font-size:9px;background:var(--soft-strong);color:var(--muted)}
+    .control-kind.medical{background:var(--blue);color:var(--ink)}
+    .control-kind.nonmedical{background:var(--green);color:var(--ink)}
+    .control-kind.absence{background:var(--red);color:var(--ink)}
+    .control-empty{padding:12px 2px;color:var(--muted);font-size:12px}
+    .enrollment-group{margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+    .enrollment-group-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;font-size:12px;color:var(--muted)}
+    .enrollment-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.enrollment-column{min-width:0;padding:8px;border-radius:14px;background:var(--soft)}
+    .enrollment-column .patient-grid{grid-template-columns:1fr!important;padding:0}.daily-edit svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
     .onboarding{position:fixed;inset:0;z-index:100;display:grid;place-items:end center;padding:18px;background:rgba(38,20,17,.36);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
     .onboarding-card{width:min(100%,430px);padding:20px;border-radius:28px;background:var(--glass-strong);border:1px solid var(--glass-line);box-shadow:0 24px 70px rgba(40,15,12,.3);color:var(--ink)}
     .onboarding-visual{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:var(--soft-strong);color:var(--navy);margin-bottom:14px}
@@ -222,7 +249,7 @@
     @media print{
       @page{margin:12mm}
       body{background:white !important;color:#1d1d1f !important;padding:0 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      body:before,header,.main-nav,.print-hide{display:none !important}
+      body:before,header,.main-nav,.nav-search,.nav-add,.print-hide{display:none !important}
       body *{visibility:hidden}
       .print-target,.print-target *{visibility:visible}
       .print-target{position:absolute !important;left:0 !important;top:0 !important;width:100% !important;margin:0 !important;padding:0 !important;background:white !important;border:0 !important;box-shadow:none !important}
@@ -247,19 +274,23 @@
       .search-box input{height:48px;font-size:16px;border-radius:15px}
       .search-box svg{top:13px}
       .search-clear{top:5px}
-      .main-nav{left:0;right:0;top:auto;bottom:0;width:auto;border-radius:18px 18px 0 0;padding:7px calc(7px + env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) calc(7px + env(safe-area-inset-left));background:rgba(255,255,255,.96)}
-      .main-nav{left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));border-radius:25px;padding:6px;background:rgba(255,248,246,.72);border:1px solid rgba(255,255,255,.78);box-shadow:0 12px 38px rgba(83,21,15,.2);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%)}
-      .main-nav .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+      .main-nav{left:86px;right:86px;top:auto;bottom:calc(8px + env(safe-area-inset-bottom));width:auto;border-radius:25px;padding:6px;background:rgba(255,248,246,.72);border:1px solid rgba(255,255,255,.78);box-shadow:0 12px 38px rgba(83,21,15,.2);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%)}
+      .main-nav .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
       .main-nav .tab{justify-content:center;text-align:center;padding:8px 3px;border:0;min-height:52px;border-radius:19px;box-shadow:none}
       .main-nav .tab.active{background:rgba(141,31,23,.92);box-shadow:0 6px 18px rgba(103,17,12,.2)}
       .main-nav .tab{flex-direction:column;gap:2px;font-size:10px;font-weight:750}
       .main-nav .nav-label{display:block}
       .main-nav .nav-icon{width:24px;height:24px}
+      .nav-search,.nav-add{position:fixed;top:auto;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;width:58px;height:58px;min-height:58px;padding:0;border-radius:22px;background:rgba(255,248,246,.82);color:var(--navy);border:1px solid rgba(255,255,255,.82);box-shadow:0 10px 28px rgba(83,21,15,.2);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%);z-index:13}
+      .nav-search{left:10px}.nav-add{right:10px;background:var(--navy);color:white;font-size:28px;font-weight:400;line-height:1}
+      .nav-search .nav-label{display:none}
+      #search{padding-top:64px;background:rgba(55,31,27,.2)}
+      .sheet-close{top:12px;right:12px}
       .daily-sticky{top:96px}
-      .daily-toolbar{grid-template-columns:minmax(0,1fr) 38px;gap:6px}
-      .daily-toolbar label{grid-column:1/3;grid-row:1;padding-left:2px}
+      .daily-toolbar{grid-template-columns:minmax(0,1fr) 38px 38px;gap:6px}
+      .daily-toolbar label{grid-column:1/4;grid-row:1;padding-left:2px}
       .daily-toolbar select{grid-column:1;grid-row:2;width:100%;height:40px;padding:8px 28px 8px 10px;font-size:14px}
-      .daily-toolbar .daily-add{grid-column:2;grid-row:2;width:38px;height:40px}
+      .daily-toolbar .daily-edit{grid-column:2;grid-row:2;width:38px;height:40px}.daily-toolbar .daily-pause{grid-column:3;grid-row:2;width:38px;height:40px}
       .daily-toolbar .daily-prev,.daily-toolbar .daily-next{display:none}
       .week-picker{grid-template-columns:minmax(102px,auto) 38px minmax(128px,1fr) 38px;gap:5px}
       .week-picker>label{font-size:14px}
@@ -284,6 +315,7 @@
       .balance-missing .badge{font-size:10px;padding:2px 5px;margin:0}
       .import-line{grid-template-columns:minmax(0,1fr) auto auto;gap:5px}
       .import-line button{padding:7px 8px;font-size:12px}
+      .control-groups{grid-template-columns:1fr;gap:9px}
     }
   </style>
 </head>
@@ -301,13 +333,13 @@
   </div>
 </header>
 <main>
+  <button class="nav-search" onclick="openSearchPanel()" aria-label="Recherche" title="Recherche">
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+    <span class="nav-label">Recherche</span>
+  </button>
   <div class="card main-nav">
     <div class="tabs">
-      <button class="tab active" data-tab="search" aria-label="Recherche" title="Recherche">
-        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
-        <span class="nav-label">Recherche</span>
-      </button>
-      <button class="tab" data-tab="daily" aria-label="Activités" title="Activités">
+      <button class="tab active" data-tab="daily" aria-label="Activités" title="Activités">
         <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.3a1.7 1.7 0 0 0 .7-3.25 1.7 1.7 0 0 1 .7-3.25H17a4 4 0 0 0 4-4C21 6.35 17 3 12 3Z"></path><circle cx="7.5" cy="10" r="1" fill="currentColor" stroke="none"></circle><circle cx="10" cy="6.8" r="1" fill="currentColor" stroke="none"></circle><circle cx="14" cy="6.8" r="1" fill="currentColor" stroke="none"></circle><circle cx="17" cy="10" r="1" fill="currentColor" stroke="none"></circle></svg>
         <span class="nav-label">Activités</span>
       </button>
@@ -321,9 +353,10 @@
       </button>
     </div>
   </div>
+  <button class="nav-add" onclick="openEventCreator()" aria-label="Ajouter un événement" title="Ajouter un événement">+</button>
 
   
-  <section id="daily" class="panel hidden">
+  <section id="daily" class="panel">
     <div class="swipe-hint">‹ Recherche à gauche · Semaine à droite ›</div>
     <div class="card">
       <h2>Remplir une activité</h2>
@@ -333,11 +366,12 @@
     <div class="card">
       <div class="daily-sticky">
         <div class="daily-toolbar">
-          <button class="secondary daily-add" onclick="activateTab('workshops')" aria-label="Ajouter une activité ponctuelle" title="Ajouter une activité ponctuelle">+</button>
+          <button class="secondary daily-edit" onclick="openDailyWorkshopEditor()" aria-label="Modifier l’atelier" title="Modifier l’atelier"><svg viewBox="0 0 24 24"><path d="m4 20 4.2-1 10.7-10.7a2.1 2.1 0 0 0-3-3L5.2 16 4 20ZM14.5 6.7l3 3"/></svg></button>
           <button class="secondary daily-prev" onclick="moveDailyActivity(-1)" aria-label="Activité précédente" title="Activité précédente">‹</button>
           <label for="dailyActivitySelect">Activité du jour</label>
           <select id="dailyActivitySelect" onchange="selectDailyActivity(this.value)"></select>
           <button class="secondary daily-next" onclick="moveDailyActivity(1)" aria-label="Activité suivante" title="Activité suivante">›</button>
+          <button id="dailyPauseButton" class="secondary daily-pause" onclick="toggleDailyWorkshopPause()" aria-label="Mettre l’atelier en pause" title="Pause">Ⅱ</button>
         </div>
       </div>
       <div id="dailyActivities" class="activity-swipe-zone"></div>
@@ -474,10 +508,22 @@
     </div>
   </section>
 
-  <section id="search" class="panel">
+  <section id="search" class="panel hidden">
+    <button class="sheet-close" onclick="closeFloatingPanel()" aria-label="Fermer le panneau" title="Fermer">×</button>
     <div id="homeStatusCard" class="card home-status">
       <div class="home-status-main"><span id="homeStatusDot" class="status-dot orange"></span><div class="home-status-text"><strong id="homeWeekLabel">Semaine en cours</strong><span id="homeDataLabel">Vérification des données…</span></div></div>
       <button class="secondary icon-action" onclick="activateTab('import')" aria-label="Voir les données de la semaine" title="Données de la semaine"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div class="card" id="controlTowerCard">
+      <div class="section-title-row"><div><h2>Où sont les patients ?</h2><div id="controlContext" class="muted">Aujourd’hui · maintenant</div></div><span id="controlTimeBadge" class="badge">14 h 00</span></div>
+      <div class="control-toolbar">
+        <div><label for="controlTimeline">Heure · de 10 h à 18 h</label><input id="controlTimeline" type="range" min="600" max="1080" step="15" oninput="setControlTime(this.value)"></div>
+        <button class="secondary control-now" onclick="resetControlTime()">Maintenant</button>
+      </div>
+      <div class="control-groups">
+        <div><div class="control-group-title"><strong>Disponibles</strong><span id="controlAvailableCount" class="badge">0</span></div><div id="controlAvailable"></div></div>
+        <div><div class="control-group-title"><strong>Indisponibles</strong><span id="controlUnavailableCount" class="badge">0</span></div><div id="controlUnavailable"></div></div>
+      </div>
     </div>
     <div class="card search-hero">
       <div class="section-title-row"><h2>Quand puis-je voir…</h2><button class="secondary icon-action" onclick="openPatientCreator()" aria-label="Ajouter un patient" title="Ajouter un patient"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
@@ -498,7 +544,7 @@
       <div id="patientResults" style="margin-top:12px" class="muted"></div>
     </div>
 
-    <div class="card">
+    <div class="card hidden" aria-hidden="true">
       <h2>J’ai un créneau libre</h2>
       <div class="row">
         <div><label>Jour</label><select id="fDay"></select></div>
@@ -507,7 +553,7 @@
       <div class="actions"><button onclick="findPatientsForSlot()">Quels patients puis-je voir ?</button></div>
       <div id="slotResults" style="margin-top:10px" class="muted">Aucune recherche lancée.</div>
     </div>
-    <div class="card">
+    <div class="card" id="eventCreatorCard">
       <details id="eventCreatorDetails" class="settings event-creator">
         <summary id="eventCreatorTitle">Ajouter un événement</summary>
         <p class="muted">Ajoutez un événement pour cette semaine ou répétez-le automatiquement chaque semaine.</p>
@@ -615,6 +661,19 @@
     </div>
   </section>
 </main>
+<div id="workshopEditOverlay" class="edit-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="workshopEditTitle" onclick="if(event.target===this)closeDailyWorkshopEditor()">
+  <div class="card edit-sheet">
+    <div class="section-title-row"><h2 id="workshopEditTitle">Modifier l’atelier</h2><button class="secondary icon-action" onclick="closeDailyWorkshopEditor()" aria-label="Fermer">×</button></div>
+    <div class="row">
+      <div><label>Nom</label><input id="dailyEditTitle"></div>
+      <div><label>Jour</label><select id="dailyEditDay"></select></div>
+      <div class="time-pair"><div><label>Début</label><input id="dailyEditStart" type="time" step="900"></div><div><label>Fin</label><input id="dailyEditEnd" type="time" step="900"></div></div>
+      <div><label>Intervenant</label><input id="dailyEditLeader"></div>
+      <div><label>Catégorie</label><select id="dailyEditCategory"><option value="">Non classé</option><option value="art-therapie">Art-thérapie</option><option value="corporel">Corporel</option><option value="autre">Autre</option></select></div>
+    </div>
+    <div class="actions"><button onclick="saveDailyWorkshopEdit('week')">Valider pour cette semaine</button><button class="secondary" onclick="saveDailyWorkshopEdit('always')">Valider pour toujours</button></div>
+  </div>
+</div>
 <div id="toast" class="toast hidden" role="status"></div>
 <div id="onboarding" class="onboarding hidden" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
   <div class="onboarding-card">
@@ -764,15 +823,21 @@ function isSeparatedAt(patient,day,time){
  return currentDay<endDay||(currentDay===endDay&&time<patient.separationEnd.time);
 }
 function activateTab(name){
+ if(name==="search"){openSearchPanel();return}
+ closeFloatingPanel();
  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
  document.querySelectorAll(".panel").forEach(p=>p.classList.add("hidden"));
  document.getElementById(name)?.classList.remove("hidden");
 }
+function floatingPanel(){return document.getElementById("search")}
+function closeFloatingPanel(){floatingPanel().classList.add("hidden");floatingPanel().classList.remove("event-mode")}
+function openSearchPanel(){floatingPanel().classList.remove("event-mode","hidden");eventCreatorDetails.open=false}
 function tabSetup(){
  document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>activateTab(btn.dataset.tab));
 }
 tabSetup();
-const SWIPE_PANELS=["search","daily","import","myplanning"];
+floatingPanel().addEventListener("click",event=>{if(event.target===floatingPanel())closeFloatingPanel()});
+const SWIPE_PANELS=["daily","import","myplanning"];
 let swipeStartX=0,swipeStartY=0;
 document.addEventListener("touchstart",event=>{
  if(event.touches.length!==1||event.target.closest("input,select,button,label,details,.calendar-scroll,.activity-swipe-zone"))return;
@@ -806,8 +871,54 @@ function defaultDay(){
  const d=new Date().getDay();
  return ({1:"Lundi",2:"Mardi",3:"Mercredi",4:"Jeudi",5:"Vendredi"})[d]||"Lundi";
 }
+function defaultControlMinutes(){const now=new Date(),minutes=now.getHours()*60+now.getMinutes();return Math.min(1080,Math.max(600,Math.round(minutes/15)*15))}
+let controlMinutes=defaultControlMinutes();
+function controlTimeLabel(minutes){const hours=Math.floor(minutes/60),mins=minutes%60;return `${hours} h${mins?` ${String(mins).padStart(2,"0")}`:""}`}
+function setControlTime(value){controlMinutes=Number(value);renderControlTower()}
+function resetControlTime(){controlMinutes=defaultControlMinutes();renderControlTower()}
+function controlKind(label){
+ const text=normalizeHeader(label);
+ if(text.includes("absence")||text.includes("sortie"))return {label:"Absent",className:"absence"};
+ if(text.includes("entretien")||text.includes("synthese"))return {label:"Médical",className:"medical"};
+ return {label:"Non médical",className:"nonmedical"};
+}
+function openControlPatient(id){activateTab("patients");openPatientDetail(id)}
+function renderControlTower(){
+ if(typeof controlTimeline==="undefined")return;
+ const day=defaultDay(),start=toTime(controlMinutes),end=toTime(Math.min(1439,controlMinutes+15)),patients=visiblePatients();
+ controlTimeline.value=String(controlMinutes);controlTimeBadge.textContent=controlTimeLabel(controlMinutes);
+ const nowMinutes=new Date().getHours()*60+new Date().getMinutes();
+ controlContext.textContent=day===defaultDay()&&Math.abs(controlMinutes-nowMinutes)<15?"Aujourd’hui · maintenant":`${day} · horaire sélectionné`;
+ const available=[],unavailable=[];
+ patients.forEach(patient=>{
+   const schedule=patientScheduleItems(patient,day),active=schedule.filter(item=>overlap(start,end,item.start,item.end)),evaluation=evaluate(patient,day,start,end);
+   const next=schedule.filter(item=>toMin(item.start)>=controlMinutes+15).sort((a,b)=>a.start.localeCompare(b.start))[0];
+   const reason=active[0]?.label||evaluation.reasons[0]||"Disponible";
+   const kind=active.length?controlKind(reason):null;
+   const row={patient,reason,next,kind};(evaluation.ok?available:unavailable).push(row);
+ });
+ const rowHtml=row=>`<button class="control-patient" onclick="openControlPatient('${row.patient.id}')"><strong>${esc(row.patient.code)}</strong><span>${esc(row.reason)}${row.kind?`<span class="control-kind ${row.kind.className}">${row.kind.label}</span>`:""}${row.next?`<small>Ensuite · ${row.next.start} ${esc(row.next.label.replace(/^Atelier : /,""))}</small>`:"<small>Aucun événement ensuite</small>"}</span></button>`;
+ controlAvailableCount.textContent=available.length;controlUnavailableCount.textContent=unavailable.length;
+ controlAvailable.innerHTML=available.length?available.map(rowHtml).join(""):'<div class="control-empty">Aucun patient disponible.</div>';
+ controlUnavailable.innerHTML=unavailable.length?unavailable.map(rowHtml).join(""):'<div class="control-empty">Aucun patient indisponible.</div>';
+}
 function setDailyDay(day){db.selectedDay=day;save()}
 function selectDailyActivity(id){db.selectedWorkshopByDay[db.selectedDay||defaultDay()]=id;db.dailyWarning="";save()}
+function selectedDailyWorkshop(){const day=db.selectedDay||defaultDay();return db.workshops.find(w=>w.id===db.selectedWorkshopByDay[day])||db.workshops.filter(w=>w.day===day).sort((a,b)=>a.start.localeCompare(b.start))[0]}
+function openDailyWorkshopEditor(){
+ const workshop=selectedDailyWorkshop();if(!workshop){showToast("Aucun atelier à modifier","warn");return}
+ workshopEditOverlay.dataset.workshopId=workshop.id;dailyEditTitle.value=workshop.title;dailyEditDay.innerHTML=DAYS.map(day=>`<option ${day===workshop.day?"selected":""}>${day}</option>`).join("");
+ dailyEditStart.value=workshop.start;dailyEditEnd.value=workshop.end;dailyEditLeader.value=workshop.leader||"";dailyEditCategory.value=workshop.category||"";workshopEditOverlay.classList.remove("hidden");
+}
+function closeDailyWorkshopEditor(){workshopEditOverlay.classList.add("hidden")}
+function saveDailyWorkshopEdit(scope){
+ const workshop=db.workshops.find(w=>w.id===workshopEditOverlay.dataset.workshopId),title=dailyEditTitle.value.trim(),start=dailyEditStart.value,end=dailyEditEnd.value;
+ if(!workshop||!title||!start||!end||start>=end){showToast("Vérifie le nom et les horaires","warn");return}
+ const changes={title,day:dailyEditDay.value,start,end,leader:dailyEditLeader.value.trim(),category:dailyEditCategory.value};Object.assign(workshop,changes);
+ if(scope==="always")Object.values(db.weeks).forEach(week=>week.workshops?.filter(w=>w.id===workshop.id).forEach(w=>Object.assign(w,changes)));
+ db.selectedDay=changes.day;db.selectedWorkshopByDay[changes.day]=workshop.id;closeDailyWorkshopEditor();save();showToast(scope==="always"?"Atelier modifié pour toujours":"Atelier modifié pour cette semaine","ok");
+}
+function toggleDailyWorkshopPause(){const workshop=selectedDailyWorkshop();if(!workshop)return;workshop.paused=!workshop.paused;save();showToast(workshop.paused?"Atelier en pause cette semaine":"Atelier réactivé","ok")}
 function moveDailyActivity(direction){
  const day=db.selectedDay||defaultDay();
  const list=db.workshops.filter(w=>w.day===day).sort((a,b)=>a.start.localeCompare(b.start));
@@ -823,6 +934,10 @@ function clearWorkshopPatients(id){
    w.patientIds=w.patientIds.filter(id=>!visibleIds.has(id));db.dailyWarning="";save();
  }
 }
+function workshopPatientOrigin(workshop,patientId){
+ if(Array.isArray(workshop.indicatedPatientIds))return workshop.indicatedPatientIds.includes(patientId)?"indication":"spontaneous";
+ return workshop.patientIds.includes(patientId)?"indication":"spontaneous";
+}
 function renderDaily(){
  const day=db.selectedDay||defaultDay();
  dailyDate.textContent=day;
@@ -832,10 +947,18 @@ function renderDaily(){
  dailyActivitySelect.disabled=false;
  let selected=list.find(w=>w.id===db.selectedWorkshopByDay[day])||list[0];
  db.selectedWorkshopByDay[day]=selected.id;
- dailyActivitySelect.innerHTML=list.map(w=>`<option value="${w.id}" ${w.id===selected.id?"selected":""}>${w.start} — ${esc(w.title)}${w.leader?` — ${esc(w.leader)}`:""}</option>`).join("");
+ dailyActivitySelect.innerHTML=list.map(w=>`<option value="${w.id}" ${w.id===selected.id?"selected":""}>${w.paused?"Ⅱ ":""}${w.start} — ${esc(w.title)}${w.leader?` — ${esc(w.leader)}`:""}</option>`).join("");
+ dailyPauseButton.textContent=selected.paused?"▶":"Ⅱ";dailyPauseButton.title=selected.paused?"Réactiver":"Mettre en pause";dailyPauseButton.setAttribute("aria-label",dailyPauseButton.title);
  const patients=visiblePatients()
    .filter(p=>!selected.special || (selected.special==="separation"&&isSeparatedAt(p,selected.day,selected.start)) || (selected.special==="tca-non-separation"&&p.tca&&!isSeparatedAt(p,selected.day,selected.start)))
    .sort((a,b)=>a.code.localeCompare(b.code,"fr",{sensitivity:"base"}));
+ const indicatedPatients=patients.filter(p=>workshopPatientOrigin(selected,p.id)==="indication");
+ const spontaneousPatients=patients.filter(p=>workshopPatientOrigin(selected,p.id)==="spontaneous");
+ const patientChecks=(list,origin)=>list.map(p=>`<label class="patient-check ${selected.patientIds.includes(p.id)?"checked":""}">
+         <input type="checkbox" ${selected.patientIds.includes(p.id)?"checked":""}
+           onchange="toggleWorkshopPatient('${selected.id}','${p.id}',this.checked,'${origin}')">
+         <span>${esc(p.code)}</span>
+       </label>`).join("") || `<span class="muted">Aucun patient.</span>`;
  dailyActivities.innerHTML=`
    <div class="daily-card">
      <div class="daily-head">
@@ -843,12 +966,10 @@ function renderDaily(){
        <div style="display:flex;align-items:center;gap:8px"><span class="badge">${patients.filter(p=>selected.patientIds.includes(p.id)).length}/${patients.length}</span><button class="secondary clear-workshop" onclick="clearWorkshopPatients('${selected.id}')" aria-label="Tout décocher" title="Tout décocher">×</button></div>
      </div>
      ${db.dailyWarning?`<div class="conflict" style="margin-top:10px">${esc(db.dailyWarning)}</div>`:""}
-     <div class="patient-grid">
-       ${patients.map(p=>`<label class="patient-check ${selected.patientIds.includes(p.id)?"checked":""}">
-         <input type="checkbox" ${selected.patientIds.includes(p.id)?"checked":""}
-           onchange="toggleWorkshopPatient('${selected.id}','${p.id}',this.checked)">
-         <span>${esc(p.code)}</span>
-       </label>`).join("") || "<span class='muted'>Aucun patient enregistré.</span>"}
+     ${selected.paused?`<div class="status muted" style="margin-top:10px">Atelier en pause pour cette semaine.</div>`:""}
+     <div class="enrollment-columns">
+       <div class="enrollment-column"><div class="enrollment-group-title"><strong>Spontané</strong><span>${spontaneousPatients.filter(p=>selected.patientIds.includes(p.id)).length}/${spontaneousPatients.length}</span></div><div class="patient-grid">${patientChecks(spontaneousPatients,"spontaneous")}</div></div>
+       <div class="enrollment-column"><div class="enrollment-group-title"><strong>Indication</strong><span>${indicatedPatients.filter(p=>selected.patientIds.includes(p.id)).length}/${indicatedPatients.length}</span></div><div class="patient-grid">${patientChecks(indicatedPatients,"indication")}</div></div>
      </div>
    </div>`;
 }
@@ -959,7 +1080,7 @@ function stableWeekFromCurrent(){
  const week=blankWeek();
  week.nurses=db.nurses.map(n=>({...JSON.parse(JSON.stringify(n)),schedule:{}}));
  week.patients=JSON.parse(JSON.stringify(db.patients));
- week.workshops=db.workshops.filter(w=>w.base||w.recurring).map(w=>({...JSON.parse(JSON.stringify(w)),patientIds:[]}));
+ week.workshops=db.workshops.filter(w=>w.base||w.recurring).map(w=>({...JSON.parse(JSON.stringify(w)),patientIds:[],paused:false}));
  return week;
 }
 function switchSelectedWeek(key){
@@ -1375,7 +1496,7 @@ function sourceLabel(source,kind){
 function scheduleTimeLabel(item){return item.allDay?"Journée entière":`${item.start}–${item.end}`}
 function patientScheduleItems(p,day){
  const items=[];
- db.workshops.filter(w=>w.day===day&&w.patientIds.includes(p.id)).forEach(w=>items.push({id:w.id,source:"workshop",start:w.start,end:w.end,allDay:!!w.allDay,label:`Atelier : ${w.title}`,origin:sourceLabel(w.source||(w.base?"base":"manual"),"workshop")}));
+ db.workshops.filter(w=>!w.paused&&w.day===day&&w.patientIds.includes(p.id)).forEach(w=>items.push({id:w.id,source:"workshop",start:w.start,end:w.end,allDay:!!w.allDay,label:`Atelier : ${w.title}`,origin:sourceLabel(w.source||(w.base?"base":"manual"),"workshop")}));
  db.constraints.filter(c=>c.personId===p.id&&c.day===day).forEach(c=>items.push({id:c.id,source:"constraint",start:c.start,end:c.end,allDay:!!c.allDay,label:c.reason,origin:sourceLabel(c.source||"manual","constraint")}));
  db.recurringCare.filter(c=>c.day===day&&recurringEventAffects(c,p.id)).forEach(c=>items.push({id:c.id,source:"recurring",start:c.start,end:c.end,label:c.label,origin:"Récurrent"}));
  return items.sort((a,b)=>a.start.localeCompare(b.start));
@@ -1408,8 +1529,8 @@ function updateEventForm(){
  eventCreatorTitle.textContent=isActivity?"Créer un atelier":isProfessional?"Créer une absence professionnelle":"Ajouter un événement";
 }
 function openEventCreator(kind="patient"){
- activateTab("search");eventType.value=kind;updateEventForm();eventCreatorDetails.open=true;
- setTimeout(()=>eventCreatorDetails.scrollIntoView({behavior:"smooth",block:"center"}),40);
+ floatingPanel().classList.add("event-mode");floatingPanel().classList.remove("hidden");eventType.value=kind;updateEventForm();eventCreatorDetails.open=true;
+ setTimeout(()=>eventCreatorDetails.scrollIntoView({behavior:"smooth",block:"start"}),40);
 }
 function openPatientCreator(){activateTab("patients");cancelPatientEdit();pUnit.value=db.activeUnit;setTimeout(()=>pCode.focus(),40)}
 function addWeeklyEvent(){
@@ -1496,7 +1617,7 @@ function renderPlanningHub(){
  planningDayWrap.classList.toggle("hidden",planningView.value!=="day");
  planningTitle.innerHTML=`<strong>${workshopsMode?"Planning des ateliers":`Planning de ${esc(name)}`}</strong><br><span class="muted">${formatWeekRange()} · ${planningView.value==="week"?"Vue semaine":"Vue journée"}</span>`;
  const itemsForDay=day=>workshopsMode
-   ?db.workshops.filter(w=>w.day===day).sort((a,b)=>a.start.localeCompare(b.start)).map(w=>({start:w.start,end:w.end,label:w.title,origin:w.leader||(w.recurring?"Récurrent":"Ponctuel"),recurring:!!w.recurring}))
+   ?db.workshops.filter(w=>!w.paused&&w.day===day).sort((a,b)=>a.start.localeCompare(b.start)).map(w=>({start:w.start,end:w.end,label:w.title,origin:w.leader||(w.recurring?"Récurrent":"Ponctuel"),recurring:!!w.recurring}))
    :planningItems(type,id,day);
  const days=planningView.value==="day"?[planningDay.value]:DAYS;
  if(planningView.value==="week"){
@@ -1717,12 +1838,22 @@ function removeWorkshop(id){
  const index=db.workshops.findIndex(w=>w.id===id);if(index<0||!confirm("Supprimer cet atelier ?"))return;
  const removed=db.workshops[index];db.workshops.splice(index,1);save();showUndoToast("Atelier supprimé",()=>{db.workshops.splice(index,0,removed);save();showToast("Suppression annulée","ok")});
 }
-function toggleWorkshopPatient(workshopId,patientId,checked){
+function toggleWorkshopPatient(workshopId,patientId,checked,origin){
  const w=db.workshops.find(x=>x.id===workshopId);if(!w)return;
+ if(!Array.isArray(w.indicatedPatientIds))w.indicatedPatientIds=[...w.patientIds];
+ if(!Array.isArray(w.spontaneousPatientIds))w.spontaneousPatientIds=[];
+ if(origin==="indication"){
+   if(!w.indicatedPatientIds.includes(patientId))w.indicatedPatientIds.push(patientId);
+   w.spontaneousPatientIds=w.spontaneousPatientIds.filter(id=>id!==patientId);
+ }
+ if(origin==="spontaneous"){
+   if(!w.spontaneousPatientIds.includes(patientId))w.spontaneousPatientIds.push(patientId);
+   w.indicatedPatientIds=w.indicatedPatientIds.filter(id=>id!==patientId);
+ }
  db.dailyWarning="";
  if(checked && !w.patientIds.includes(patientId)){
    w.patientIds.push(patientId);
-   const conflicts=db.workshops.filter(other=>other.id!==w.id&&other.day===w.day&&other.patientIds.includes(patientId)&&overlap(w.start,w.end,other.start,other.end));
+   const conflicts=db.workshops.filter(other=>!other.paused&&other.id!==w.id&&other.day===w.day&&other.patientIds.includes(patientId)&&overlap(w.start,w.end,other.start,other.end));
    if(conflicts.length){
      const patient=patientById(patientId);
      db.dailyWarning=`${patient?.code||"Ce patient"} est déjà inscrit à ${conflicts.map(x=>`${x.title} (${x.start}–${x.end})`).join(", ")}. Inscription conservée — à vérifier.`;
@@ -1733,7 +1864,7 @@ function toggleWorkshopPatient(workshopId,patientId,checked){
  if(!db.dailyWarning)showToast(checked?"Inscription enregistrée":"Inscription retirée","ok");
 }
 function workshopConflictsForPatient(patientId,day,start,end){
- return db.workshops.filter(w =>
+ return db.workshops.filter(w => !w.paused &&
    w.day===day &&
    w.patientIds.includes(patientId) &&
    overlap(start,end,w.start,w.end)
@@ -1905,7 +2036,7 @@ function render(){
    const patientChecks=displayedPatients.length?displayedPatients.map(p=>`
      <label class="switchline" style="margin:6px 0">
        <input type="checkbox" ${w.patientIds.includes(p.id)?"checked":""}
-         onchange="toggleWorkshopPatient('${w.id}','${p.id}',this.checked)">
+         onchange="toggleWorkshopPatient('${w.id}','${p.id}',this.checked,'indication')">
        <span>${esc(p.code)}</span>
      </label>`).join(""):"<span class='muted'>Ajoute d’abord des patients.</span>";
    return `<div class="person">
@@ -1980,8 +2111,8 @@ function render(){
  }
  if(typeof activityBalance!=="undefined"){
    const balancePatients=visiblePatients();
-   const noArt=balancePatients.filter(p=>!db.workshops.some(w=>w.patientIds.includes(p.id)&&w.category==="art-therapie")).map(p=>p.code);
-   const noBody=balancePatients.filter(p=>!db.workshops.some(w=>w.patientIds.includes(p.id)&&w.category==="corporel")).map(p=>p.code);
+   const noArt=balancePatients.filter(p=>!db.workshops.some(w=>!w.paused&&w.patientIds.includes(p.id)&&w.category==="art-therapie")).map(p=>p.code);
+   const noBody=balancePatients.filter(p=>!db.workshops.some(w=>!w.paused&&w.patientIds.includes(p.id)&&w.category==="corporel")).map(p=>p.code);
    const total=Math.max(balancePatients.length,1),artCovered=balancePatients.length-noArt.length,bodyCovered=balancePatients.length-noBody.length;
    activityBalance.innerHTML=`
      <div class="balance-grid">
@@ -2031,6 +2162,7 @@ function render(){
  updateEventForm();
  renderMyPlanning();
  renderDaily();
+ renderControlTower();
 }
 ensureBaseWorkshops();
 const migratedAgendaEvents=applyAllAgendaEvents(true);
